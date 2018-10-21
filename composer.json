@@ -1,6 +1,6 @@
 {
     "name": "rhorber/id3rw",
-    "description": "PHP-Library for reading and writing ID3-Tags.",
+    "description": "PHP-Library for reading and writing ID3 tags.",
     "type": "library",
     "keywords": ["id3", "id3tag"],
     "license": "MIT",

@@ -1,6 +1,6 @@
 # ID3rw
 
-> PHP-Library for reading and writing ID3-Tags.
+> PHP-Library for reading and writing ID3 tags.
 
 > ⚠ The Library yet only supports Version 2.4.0.
 
@@ -42,6 +42,6 @@ Features I will add:
 
 ## About/History
 
-I needed a library for modifying some ID3-Tags.
+I needed a library for modifying some ID3 tags.
 I did not find any library for doing that (getid3 was not able to write correctly),
 so I started writing my own in plain PHP. 
