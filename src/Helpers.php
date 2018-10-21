@@ -5,6 +5,7 @@
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
+ * @version 21.10.2018
  */
 namespace Rhorber\ID3rw;
 
@@ -12,11 +13,10 @@ namespace Rhorber\ID3rw;
 /**
  * Class containing helper methods.
  *
- * - {@link __construct}: ShortDescription.
- * - {@link method1}: ShortDescription.
- * - {@link method2}: ShortDescription.
+ * - {@link removeSynchSafeBits}: Returns the decimal value of a synch safe integer (as binary).
+ * - {@link addSynchSafeBits}: Returns the synch safe HEX value (zero padded to four bytes) of a decimal value.
  *
- * @package Rhorber\Templates
+ * @package Rhorber\ID3rw
  * @author  Raphael Horber
  * @version 21.10.2018
  */
@@ -27,7 +27,10 @@ class Helpers
      *
      * @param string $value Synch safe integer as binary value.
      *
-     * @return integer Decimal value of synch safe integer.
+     * @return  integer Decimal value of synch safe integer.
+     * @access  public
+     * @author  Raphael Horber
+     * @version 21.10.2018
      */
     public static function removeSynchSafeBits(string $value): int
     {
@@ -47,7 +50,10 @@ class Helpers
      *
      * @param integer $value Value to get the synch safe integer of (as decimal integer).
      *
-     * @return string Synch safe integer as HEX (zero padded to four bytes).
+     * @return  string Synch safe integer as HEX (zero padded to four bytes).
+     * @access  public
+     * @author  Raphael Horber
+     * @version 21.10.2018
      */
     public static function addSynchSafeBits(int $value): string
     {
