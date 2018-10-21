@@ -11,7 +11,7 @@
 
 ```php
 // Read frames from file.
-$reader = new \Rhorber\ID3RW\Reader('/home/user/myfile.mp3');
+$reader = new \Rhorber\ID3rw\Reader('/home/user/myfile.mp3');
 $frames = $reader->getFrames();
 print_r($frames);
 
@@ -19,7 +19,7 @@ print_r($frames);
 $frames['TIT2']['content'] = '2018-10-21_'.$frames['TIT2']['content'];
 
 // Write a new file (with modified title).
-$writer = new \Rhorber\ID3RW\Writer();
+$writer = new \Rhorber\ID3rw\Writer();
 $writer->writeNewFiel($frames, '/home/user/mynewfile.mp3');
 ```
 

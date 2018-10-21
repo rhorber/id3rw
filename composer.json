@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Rhorber\\ID3RW\\": "src/"
+            "Rhorber\\ID3rw\\": "src/"
         }
     }
 }
