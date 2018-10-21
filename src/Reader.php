@@ -31,7 +31,7 @@ class Reader
      * @access private
      * @var    resource
      */
-    private $_fileHandle;
+    private $_fileHandle = null;
 
     /**
      * Major version of the source file (4).
@@ -39,7 +39,7 @@ class Reader
      * @access private
      * @var    integer
      */
-    private $_version;
+    private $_version = 0;
 
     /**
      * Total size of the tag (excluding header, including padding).
@@ -47,7 +47,7 @@ class Reader
      * @access private
      * @var    integer
      */
-    private $_tagSize;
+    private $_tagSize = 0;
 
     /**
      * Parsed frames of the tag.
@@ -55,7 +55,7 @@ class Reader
      * @access private
      * @var    array[]
      */
-    private $_frames;
+    private $_frames = [];
 
 
     /**
@@ -79,7 +79,7 @@ class Reader
         // declare(encoding="UTF-8");
 
         $this->_parseHeader();
-        $this->parseFrames();
+        $this->_parseFrames();
 
         fclose($this->_fileHandle);
     }
@@ -89,7 +89,7 @@ class Reader
      *
      * Format:
      * <code>
-     * [
+     * 'identifier' => [
      *   'identifier' => 'Four character identifier of the frame',
      *   'content' => 'Text frames only, parsed content',
      *   'encoding' => 'Text frames only, text encoding of content',
@@ -172,7 +172,7 @@ class Reader
      * @author  Raphael Horber
      * @version 21.10.2018
      */
-    private function parseFrames()
+    private function _parseFrames()
     {
         $frames = fread($this->_fileHandle, $this->_tagSize);
 
@@ -225,7 +225,7 @@ class Reader
                             throw new \UnexpectedValueException("Invalid BOM, got: ".bin2hex($bom));
                         }
 
-                        $content   = substr($content, 2);
+                        $content = substr($content, 2);
 //                        $delimiter = "\x00\x00";
                         break;
 
@@ -257,9 +257,9 @@ class Reader
 
             $this->_frames[$identifier] = [
                 'identifier' => $identifier,
-                'content' => $content,
-                'encoding' => $encoding,
-                'raw' => $rawContent,
+                'content'    => $content,
+                'encoding'   => $encoding,
+                'raw'        => $rawContent,
             ];
 
             // Frame header + frame size.

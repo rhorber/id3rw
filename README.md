@@ -34,6 +34,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## TODO
 
 Features I will add:
+* Add more writing variants and expand their docs.
 * Support more versions (at least V2.3.0).
 * Improve parsing of non-text frames.
 * Return detailed info about frames (not only technical name).
