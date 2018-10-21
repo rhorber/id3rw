@@ -1,0 +1,22 @@
+{
+    "name": "rhorber/id3rw",
+    "description": "PHP-Library for reading and writing ID3-Tags.",
+    "type": "library",
+    "keywords": ["id3", "id3tag"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Raphael Horber",
+            "email": "raphael.horber@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rhorber\\ID3RW\\": "src/"
+        }
+    }
+}
