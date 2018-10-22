@@ -3,6 +3,8 @@
     "description": "PHP-Library for reading and writing ID3 tags.",
     "type": "library",
     "keywords": ["id3", "id3tag"],
+    "homepage": "https://github.com/rhorber/id3rw",
+    "readme": "README.md",
     "license": "MIT",
     "authors": [
         {
