@@ -128,7 +128,7 @@ class Reader
      * @throws  \UnexpectedValueException If the tag does contain unsupported features (wrong version, flags).
      * @access  private
      * @author  Raphael Horber
-     * @version 21.10.2018
+     * @version 24.12.2018
      */
     private function _parseHeader()
     {
@@ -155,8 +155,14 @@ class Reader
             throw new \UnexpectedValueException("Unsupported version, got: ".bin2hex($version));
         }
 
+        if (($tagFlags | "\xF0") !== "\xF0") {
+            // Only the first four bits are valid/known flags.
+            // TODO: Better would be to add a warning and ignore the flags.
+            throw new \UnexpectedValueException("Invalid header flags, got: ".bin2hex($tagFlags));
+        }
+
         if ($tagFlags !== "\x00") {
-            throw new \UnexpectedValueException("Unsupported header flags, got: ".$tagFlags);
+            throw new \UnexpectedValueException("Unsupported header flags, got: ".bin2hex($tagFlags));
         }
 
         $this->_tagSize = Helpers::removeSynchSafeBits($tagSize);
