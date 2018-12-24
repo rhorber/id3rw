@@ -77,9 +77,21 @@ class Reader
             throw new \InvalidArgumentException("File could not be opened!");
         }
         // declare(encoding="UTF-8");
+        mb_internal_encoding("UTF-8");
 
         $this->_parseHeader();
         $this->_parseFrames();
+
+        // TODO: Extract to method
+        foreach (["WCOM", "WOAR"] as $identifier) {
+            if (isset($this->_frames[$identifier]) === true && count($this->_frames[$identifier]['content']) === 1) {
+                $content = $this->_frames[$identifier]['content'][0];
+                $raw     = $this->_frames[$identifier]['raw'][0];
+
+                $this->_frames[$identifier]['content'] = $content;
+                $this->_frames[$identifier]['raw']     = $raw;
+            }
+        }
 
         fclose($this->_fileHandle);
     }
@@ -197,7 +209,7 @@ class Reader
             $frameFlags = substr($header, 8, 2);
 
             if ($frameFlags !== "\x00\x00") {
-                throw new \UnexpectedValueException("Unsupported frame flags, got: ".bin2hex($frameFlags));
+                throw new \UnexpectedValueException("Unsupported frame flags, got: ".bin2hex($frameFlags)." - ".$identifier);
             }
 
             if ($this->_version === 4) {
@@ -207,6 +219,8 @@ class Reader
             }
 
             $rawContent = substr($stringToParse, 10, $frameSize);
+            $encoding   = null;
+            $contentKey = null;
 
             // TODO: Improve/Add parsing of other frames than "text".
             // TODO: Text frames: Support multiple strings (v2.4.0).
@@ -277,17 +291,85 @@ class Reader
                 }
 
                 $content = $strings;
+            } elseif ($identifier === "WXXX") {
+                try {
+                    $encodingInfo = Helpers::getEncoding($rawContent);
+                } catch (\UnexpectedValueException $exception) {
+                    throw new \UnexpectedValueException($exception->getMessage());
+                }
+
+                $encoding  = $encodingInfo['encoding'];
+                $delimiter = $encodingInfo['delimiter'];
+                $content   = $encodingInfo['content'];
+
+                $characters    = str_split($content, strlen($delimiter));
+                $splitPosition = array_search($delimiter, $characters);
+
+                if ($splitPosition !== false) {
+                    $description = array_slice($characters, 0, $splitPosition);
+                    $url         = array_slice($characters, $splitPosition + 1);
+                } else {
+                    $description = $characters;
+                    $url         = [];
+                }
+
+                $description = implode("", $description);
+                $url         = implode("", $url);
+
+                $converted  = mb_convert_encoding($description, mb_internal_encoding(), $encoding);
+                $identifier = "WXXX-".$converted;
+
+                $strings = [
+                    'description' => $description,
+                    'url'         => $url,
+                ];
+
+                $content = $strings;
+            } elseif ($identifier{0} === "W") {
+                $content = $rawContent;
+
+                $position = strpos($content, "\x00");
+                if ($position !== false) {
+                    $content = substr($content, 0, $position);
+                }
+
+                if (in_array($identifier, ["WCOM", "WOAR"]) === true) {
+                    if (isset($this->_frames[$identifier]) === true) {
+                        $contentKey = count($this->_frames[$identifier]['content']);
+                    } else {
+                        $contentKey = 0;
+                    }
+                }
             } else {
-                $content  = null;
-                $encoding = null;
+                $content = null;
             }
 
-            $this->_frames[$identifier] = [
+            if ($contentKey !== null) {
+                if (isset($this->_frames[$identifier]) === true) {
+                    $frameContent = $this->_frames[$identifier]['content'];
+                    $frameRaw     = $this->_frames[$identifier]['raw'];
+                } else {
+                    $frameContent = [];
+                    $frameRaw     = [];
+                }
+                $frameContent[$contentKey] = $content;
+                $frameRaw[$contentKey]     = $rawContent;
+
+                $content    = $frameContent;
+                $rawContent = $frameRaw;
+            }
+
+            $element = [
                 'identifier' => substr($identifier, 0, 4),
                 'content'    => $content,
-                'encoding'   => $encoding,
                 'raw'        => $rawContent,
             ];
+
+            if ($encoding !== null) {
+                $element['encoding'] = $encoding;
+            }
+
+            $this->_frames[$identifier] = $element;
 
             // Frame header + frame size.
             $totalFrameSize = 10 + $frameSize;
