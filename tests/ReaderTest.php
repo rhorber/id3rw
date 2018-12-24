@@ -40,6 +40,24 @@ class ReaderTest extends TestCase
         new Reader(__DIR__."/files/unknownFlags.mp3");
     }
 
+    public function testUfidFrame()
+    {
+        // Act.
+        $reader = new Reader(__DIR__."/files/ufidFrame.mp3");
+        $frames = $reader->getFrames();
+
+        // Assert.
+        $identifier = "UFID-http://www.id3.org/dummy/ufid.html";
+        $this->assertFrameExists($frames, $identifier);
+
+        $frame    = $frames[$identifier];
+        $expected = [
+            'encoding' => null,
+            'content'  => "id-42",
+        ];
+        $this->assertFrameContent($frame, $expected);
+    }
+
     public function testTextFrameMultipleStrings()
     {
         // Act.

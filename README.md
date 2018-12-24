@@ -40,6 +40,9 @@ Features I will add:
 * Return detailed info about frames (not only technical name).
 * Improve readme.
 
+- Add names and/or descriptions to the frames.
+- Add the lists of frames (TCON, TFLT, TMED (TKEY))
+- Add notices when displaying TCOP and TPRO
 
 ## About/History
 

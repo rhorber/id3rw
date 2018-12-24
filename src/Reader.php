@@ -340,6 +340,18 @@ class Reader
                         $contentKey = 0;
                     }
                 }
+            } elseif ($identifier === "UFID") {
+                $position = strpos($rawContent, "\x00");
+                $owner    = substr($rawContent, 0, $position);
+                $content  = substr($rawContent, ($position + 1));
+
+                $identifier = "UFID-".$owner;
+            } elseif (in_array($identifier{0}, ["X", "Y", "Z"]) === true) {
+                // TODO: Add info: Experimental Frame.
+                $content = $rawContent;
+            } elseif (in_array($identifier, ["MCDI"])) {
+                // TODO: MCDI requires TRCK (add warning if missing)
+                $content = $rawContent;
             } else {
                 $content = null;
             }
