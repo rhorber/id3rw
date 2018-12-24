@@ -39,6 +39,186 @@ class ReaderTest extends TestCase
         // Act.
         new Reader(__DIR__."/files/unknownFlags.mp3");
     }
+
+    public function testTextFrameMultipleStrings()
+    {
+        // Act.
+        $reader = new Reader(__DIR__."/files/textFrames.mp3");
+        $frames = $reader->getFrames();
+
+        // Assert.
+        $identifier = "TIT1";
+        $this->assertFrameExists($frames, $identifier);
+
+        $frame    = $frames[$identifier];
+        $expected = [
+            'encoding' => "UTF-16LE",
+            'content'  => [
+                "UTF-16LE Text 1",
+                "UTF-16LE Text 2",
+            ],
+        ];
+        $this->assertTextFrame($frame, $expected);
+    }
+
+    public function testTextFrameMultipleStringsTerminated()
+    {
+        // Act.
+        $reader = new Reader(__DIR__."/files/textFrames.mp3");
+        $frames = $reader->getFrames();
+
+        // Assert.
+        $identifier = "TIT2";
+        $this->assertFrameExists($frames, $identifier);
+
+        $frame    = $frames[$identifier];
+        $expected = [
+            'encoding' => "UTF-16LE",
+            'content'  => [
+                "UTF-16LE Text 1",
+                "UTF-16LE Text 2",
+            ],
+        ];
+        $this->assertTextFrame($frame, $expected);
+    }
+
+    public function testTextFrameOneString()
+    {
+        // Act.
+        $reader = new Reader(__DIR__."/files/textFrames.mp3");
+        $frames = $reader->getFrames();
+
+        // Assert.
+        $identifier = "TIT3";
+        $this->assertFrameExists($frames, $identifier);
+
+        $frame    = $frames[$identifier];
+        $expected = [
+            'encoding' => "UTF-16LE",
+            'content'  => "UTF-16LE Text",
+        ];
+        $this->assertTextFrame($frame, $expected);
+    }
+
+    public function testTextFrameEmptyString()
+    {
+        // Act.
+        $reader = new Reader(__DIR__."/files/textFrames.mp3");
+        $frames = $reader->getFrames();
+
+        // Assert.
+        $identifier = "TALB";
+        $this->assertFrameExists($frames, $identifier);
+
+        $frame    = $frames[$identifier];
+        $expected = [
+            'encoding' => "UTF-16LE",
+            'content'  => "",
+        ];
+        $this->assertTextFrame($frame, $expected);
+    }
+
+    public function testTmclFrame()
+    {
+        // Act.
+        $reader = new Reader(__DIR__."/files/textFrames.mp3");
+        $frames = $reader->getFrames();
+
+        // Assert.
+        $identifier = "TMCL";
+        $this->assertFrameExists($frames, $identifier);
+
+        $frame    = $frames[$identifier];
+        $expected = [
+            'encoding' => 'UTF-16LE',
+            'content'  => [
+                'Saxophone' => 'Raphael Horber',
+                'Piano'     => 'Stefan Horber',
+            ],
+        ];
+        $this->assertTextFrame($frame, $expected, true);
+    }
+
+    public function testTxxxFrameIso()
+    {
+        // Act.
+        $reader = new Reader(__DIR__."/files/textFrames.mp3");
+        $frames = $reader->getFrames();
+
+        // Assert.
+        $identifier = "TXXX-ISO-8859-1";
+        $this->assertFrameExists($frames, $identifier);
+
+        $frame    = $frames[$identifier];
+        $expected = [
+            'encoding' => 'ISO-8859-1',
+            'content'  => [
+                'description' => 'ISO-8859-1',
+                'value'       => 'TXXX frame with ISO encoding.',
+            ],
+        ];
+        $this->assertTextFrame($frame, $expected);
+    }
+
+    public function testTxxxFrameUtf()
+    {
+        // Act.
+        $reader = new Reader(__DIR__."/files/textFrames.mp3");
+        $frames = $reader->getFrames();
+
+        // Assert.
+        $identifier = "TXXX-UTF-16";
+        $this->assertFrameExists($frames, $identifier);
+
+        $frame    = $frames[$identifier];
+        $expected = [
+            'encoding' => 'UTF-16BE',
+            'content'  => [
+                'description' => 'UTF-16',
+                'value'       => 'TXXX frame with UTF-16BE encoding.',
+            ],
+        ];
+        $this->assertTextFrame($frame, $expected);
+    }
+
+
+    private function assertFrameExists($frames, $identifier)
+    {
+        self::assertArrayHasKey($identifier, $frames);
+        self::assertSame(substr($identifier, 0, 4), $frames[$identifier]['identifier']);
+    }
+
+    private function assertTextFrame($frame, $expected, $convertKeys = false)
+    {
+        self::assertArrayHasKey('encoding', $expected, "Expected array does not have key 'encoding'.");
+        self::assertArrayHasKey('content', $expected, "Expected array does not have key 'content'.");
+        self::assertArrayHasKey('encoding', $frame, "Frame does not have key 'encoding'.");
+        self::assertArrayHasKey('content', $frame, "Frame does not have key 'content'.");
+
+        $encoding = $expected['encoding'];
+        self::assertSame($encoding, $frame['encoding'], "Frame's encoding does not match expected one.");
+
+        $expectedContent = $expected['content'];
+        $frameContent    = $frame['content'];
+
+        if (is_array($expectedContent) === true) {
+            self::assertTrue(is_array($expectedContent), "Expected content to be of type 'array'.");
+            self::assertCount(count($expectedContent), $frameContent);
+
+            foreach ($expectedContent as $key => $value) {
+                if ($convertKeys === true) {
+                    $key = mb_convert_encoding($key, $encoding);
+                }
+                $value = mb_convert_encoding($value, $encoding);
+
+                self::assertArrayHasKey($key, $frameContent);
+                self::assertSame($value, $frameContent[$key]);
+            }
+        } elseif (is_string($expectedContent) === true) {
+            self::assertTrue(is_string($expectedContent), "Expected content to be of type 'string'.");
+            self::assertSame(mb_convert_encoding($expectedContent, $encoding), $frameContent);
+        }
+    }
 }
 
 

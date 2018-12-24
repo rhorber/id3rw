@@ -221,19 +221,69 @@ class Reader
                 $delimiter = $encodingInfo['delimiter'];
                 $content   = $encodingInfo['content'];
 
-                /*
-                $delimiterLength = (-1) * strlen($delimiter);
-                while (substr($content, $delimiterLength) === $delimiter) {
-                    $content = substr($content, 0, $delimiterLength);
+                $characters = str_split($content, strlen($delimiter));
+                $strings    = [];
+
+                while (count($characters) >= 1) {
+                    $splitPosition = array_search($delimiter, $characters);
+
+                    if ($splitPosition !== false) {
+                        $part       = array_slice($characters, 0, $splitPosition);
+                        $characters = array_slice($characters, $splitPosition + 1);
+
+                        $strings[] = implode("", $part);
+                    } else {
+                        $strings[]  = implode("", $characters);
+                        $characters = [];
+                    }
                 }
-                */
+
+                if (count($characters) > 0) {
+                    $strings[] = implode("", $characters);
+                }
+
+                $nofStrings = count($strings);
+
+                if ($nofStrings > 1) {
+                    $lastIndex = $nofStrings - 1;
+                    if ($strings[$lastIndex] === "") {
+                        array_pop($strings);
+                        $nofStrings--;
+                    }
+                }
+                if ($nofStrings === 1) {
+                    $strings = $strings[0];
+                }
+
+                if ($identifier === "TXXX") {
+                    $description = array_shift($strings);
+                    $converted   = mb_convert_encoding($description, mb_internal_encoding(), $encoding);
+                    $identifier  = "TXXX-".$converted;
+                    $value       = implode($delimiter, $strings);
+
+                    $strings = [
+                        'description' => $description,
+                        'value'       => $value,
+                    ];
+                } elseif (in_array($identifier, ["TMCL", "TIPL"]) === true) {
+                    $map = [];
+                    while (count($strings) > 0) {
+                        $key   = array_shift($strings);
+                        $value = array_shift($strings);
+
+                        $map[$key] = $value;
+                    }
+                    $strings = $map;
+                }
+
+                $content = $strings;
             } else {
                 $content  = null;
                 $encoding = null;
             }
 
             $this->_frames[$identifier] = [
-                'identifier' => $identifier,
+                'identifier' => substr($identifier, 0, 4),
                 'content'    => $content,
                 'encoding'   => $encoding,
                 'raw'        => $rawContent,
