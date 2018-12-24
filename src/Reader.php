@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 21.10.2018
+ * @version 24.12.2018
  */
 namespace Rhorber\ID3rw;
 
@@ -21,7 +21,7 @@ namespace Rhorber\ID3rw;
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 21.10.2018
+ * @version 24.12.2018
  */
 class Reader
 {
@@ -170,7 +170,7 @@ class Reader
      * @throws  \UnexpectedValueException If the tag does contain unsupported features (flags, encoding, BOM).
      * @access  private
      * @author  Raphael Horber
-     * @version 21.10.2018
+     * @version 24.12.2018
      */
     private function _parseFrames()
     {
@@ -205,51 +205,22 @@ class Reader
             // TODO: Improve/Add parsing of other frames than "text".
             // TODO: Text frames: Support multiple strings (v2.4.0).
             if ($identifier{0} === "T") {
-                $encodingCode = substr($rawContent, 0, 1);
-                $content      = substr($rawContent, 1);
-
-                switch ($encodingCode) {
-                    case "\x00":
-                        $encodingName = "ISO-8859-1";
-//                        $delimiter    = "\x00";
-                        break;
-
-                    case "\x01":
-                        $bom = substr($content, 0, 2);
-
-                        if ($bom === "\xff\xfe") {
-                            $encodingName = "UTF-16LE";
-                        } elseif ($bom === "\xfe\xff") {
-                            $encodingName = "UTF-16BE";
-                        } else {
-                            throw new \UnexpectedValueException("Invalid BOM, got: ".bin2hex($bom));
-                        }
-
-                        $content = substr($content, 2);
-//                        $delimiter = "\x00\x00";
-                        break;
-
-                    case "\x02":
-                        $encodingName = "UTF-16BE";
-//                        $delimiter    = "\x00\x00";
-                        break;
-
-                    case "\x03":
-                        $encodingName = "UTF-8";
-//                        $delimiter    = "\x00";
-                        break;
-
-
-                    default:
-                        throw new \UnexpectedValueException("Invalid text encoding, got: ".bin2hex($encodingCode));
+                try {
+                    $encodingInfo = Helpers::getEncoding($rawContent);
+                } catch (\UnexpectedValueException $exception) {
+                    throw new \UnexpectedValueException($exception->getMessage());
                 }
+
+                $encoding  = $encodingInfo['encoding'];
+                $delimiter = $encodingInfo['delimiter'];
+                $content   = $encodingInfo['content'];
+
                 /*
                 $delimiterLength = (-1) * strlen($delimiter);
                 while (substr($content, $delimiterLength) === $delimiter) {
                     $content = substr($content, 0, $delimiterLength);
                 }
                 */
-                $encoding = $encodingName;
             } else {
                 $content  = null;
                 $encoding = null;
