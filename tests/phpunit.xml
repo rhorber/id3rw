@@ -1,0 +1,21 @@
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.5/phpunit.xsd"
+    bootstrap="../vendor/autoload.php"
+    colors="true"
+    columns="max"
+    backupGlobals="false"
+    addUncoveredFilesFromWhitelist="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+    beStrictAboutOutputDuringTests="true">
+    <testsuites>
+        <testsuite name="ID3rw">
+            <directory>.</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../src/</directory>
+        </whitelist>
+    </filter>
+</phpunit>
