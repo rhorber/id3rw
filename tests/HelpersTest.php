@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests
  * @author  Raphael Horber
- * @version 21.10.2018
+ * @version 28.12.2018
  */
 namespace Rhorber\ID3rw\Tests;
 
@@ -38,6 +38,110 @@ class HelpersTest extends TestCase
 
         // Assert.
         self::assertSame("\x00\x1A\x46\x76", $actual);
+    }
+
+    public function testSplitString()
+    {
+        // Act.
+        $actual = Helpers::splitString("\x00", "2222\x003333");
+
+        // Assert.
+        $expected = [
+            "2222",
+            "3333",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    public function testSplitStringDelimiterAtEnd()
+    {
+        // Act.
+        $actual = Helpers::splitString("\x00", "2222\x003333\x00");
+
+        // Assert.
+        $expected = [
+            "2222",
+            "3333",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    public function testSplitStringDelimiterOnly()
+    {
+        // Act.
+        $actual = Helpers::splitString("\x00", "\x00");
+
+        // Assert.
+        $expected = [
+            "",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    public function testSplitStringLimitElements()
+    {
+        // Act.
+        $actual = Helpers::splitString("\x00", "2222\x003333\x004444", 2);
+
+        // Assert.
+        $expected = [
+            "2222",
+            "3333\x004444",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    public function testSplitStringPaddingElements()
+    {
+        // Act.
+        $actual = Helpers::splitString("\x00", "2222", 3);
+
+        // Assert.
+        $expected = [
+            "2222",
+            "",
+            "",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    public function testSplitStringUtf16Be()
+    {
+        // Act.
+        $actual = Helpers::splitString("\x00\x00", "\x00\x32\x00\x32\x00\x32\x00\x00\x00\x33\x00\x33\x00\x33");
+
+        // Assert.
+        $expected = [
+            mb_convert_encoding("222", "UTF-16BE"),
+            mb_convert_encoding("333", "UTF-16BE"),
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    public function testSplitStringUtf16Le()
+    {
+        // Act.
+        $actual = Helpers::splitString("\x00\x00", "\x32\x00\x32\x00\x32\x00\x00\x00\x33\x00\x33\x00\x33\x00");
+
+        // Assert.
+        $expected = [
+            mb_convert_encoding("222", "UTF-16LE"),
+            mb_convert_encoding("333", "UTF-16LE"),
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    public function testSplitStringUtf8()
+    {
+        // Act.
+        $actual = Helpers::splitString("\x00", "2222\x003333");
+
+        // Assert.
+        $expected = [
+            "2222",
+            "3333",
+        ];
+        self::assertSame($expected, $actual);
     }
 
     /** @covers ::getEncoding */

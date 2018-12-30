@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 24.12.2018
+ * @version 28.12.2018
  */
 namespace Rhorber\ID3rw;
 
@@ -18,7 +18,7 @@ namespace Rhorber\ID3rw;
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 24.12.2018
+ * @version 28.12.2018
  */
 class Helpers
 {
@@ -67,6 +67,47 @@ class Helpers
         $paddedHex = sprintf("%08s", $hexValue);
 
         return hex2bin($paddedHex);
+    }
+
+    /**
+     * Splits the string by the delimiter.
+     *
+     * @param string $delimiter The delimiter.
+     * @param string $string The string to split.
+     * @param integer $nofElements If set, the returned array will contain exactly `nofElements` elements.
+     *                             If there would be more elements, the last element contains the rest of string.
+     *                             If there aren't enough elements, the array will be padded with empty strings.
+     *
+     * @return  string[] Result array.
+     * @access  public
+     * @author  Raphael Horber
+     * @version 28.10.2018
+     */
+    public static function splitString(string $delimiter, string $string, int $nofElements = PHP_INT_MAX): array
+    {
+        // Special implementation needed to split UTF-16LE correctly.
+        $characters = str_split($string, strlen($delimiter));
+        $strings    = [];
+
+        while (count($characters) > 0) {
+            $splitPosition = array_search($delimiter, $characters);
+
+            if ($splitPosition === false || (count($strings) + 1) === $nofElements) {
+                $strings[]  = implode("", $characters);
+                $characters = [];
+            } else {
+                $part       = array_slice($characters, 0, $splitPosition);
+                $characters = array_slice($characters, $splitPosition + 1);
+
+                $strings[] = implode("", $part);
+            }
+        }
+
+        if ($nofElements !== PHP_INT_MAX) {
+            $strings = array_pad($strings, $nofElements, "");
+        }
+
+        return $strings;
     }
 
     /**

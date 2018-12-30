@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 24.12.2018
+ * @version 28.12.2018
  */
 namespace Rhorber\ID3rw;
 
@@ -21,7 +21,7 @@ namespace Rhorber\ID3rw;
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 24.12.2018
+ * @version 28.12.2018
  */
 class Reader
 {
@@ -68,7 +68,7 @@ class Reader
      * @throws  \UnexpectedValueException If the tag does contain unsupported features (wrong version, flags).
      * @access  public
      * @author  Raphael Horber
-     * @version 21.10.2018
+     * @version 28.10.2018
      */
     public function __construct(string $filename)
     {
@@ -77,6 +77,7 @@ class Reader
             throw new \InvalidArgumentException("File could not be opened!");
         }
         // declare(encoding="UTF-8");
+        $internalEncoding = mb_internal_encoding();
         mb_internal_encoding("UTF-8");
 
         $this->_parseHeader();
@@ -94,6 +95,7 @@ class Reader
         }
 
         fclose($this->_fileHandle);
+        mb_internal_encoding($internalEncoding);
     }
 
     /**
@@ -188,7 +190,7 @@ class Reader
      * @throws  \UnexpectedValueException If the tag does contain unsupported features (flags, encoding, BOM).
      * @access  private
      * @author  Raphael Horber
-     * @version 24.12.2018
+     * @version 28.12.2018
      */
     private function _parseFrames()
     {
@@ -224,7 +226,7 @@ class Reader
 
             // TODO: Improve/Add parsing of other frames than "text".
             // TODO: Text frames: Support multiple strings (v2.4.0).
-            if ($identifier{0} === "T") {
+            if ($identifier === "TXXX") {
                 try {
                     $encodingInfo = Helpers::getEncoding($rawContent);
                 } catch (\UnexpectedValueException $exception) {
@@ -235,51 +237,35 @@ class Reader
                 $delimiter = $encodingInfo['delimiter'];
                 $content   = $encodingInfo['content'];
 
-                $characters = str_split($content, strlen($delimiter));
-                $strings    = [];
+                list($description, $value) = Helpers::splitString($delimiter, $content, 2);
 
-                while (count($characters) >= 1) {
-                    $splitPosition = array_search($delimiter, $characters);
+                $converted  = mb_convert_encoding($description, mb_internal_encoding(), $encoding);
+                $identifier = "TXXX-".$converted;
 
-                    if ($splitPosition !== false) {
-                        $part       = array_slice($characters, 0, $splitPosition);
-                        $characters = array_slice($characters, $splitPosition + 1);
+                $strings = [
+                    'description' => $description,
+                    'value'       => $value,
+                ];
 
-                        $strings[] = implode("", $part);
-                    } else {
-                        $strings[]  = implode("", $characters);
-                        $characters = [];
-                    }
+                $content = $strings;
+            } elseif ($identifier{0} === "T") {
+                try {
+                    $encodingInfo = Helpers::getEncoding($rawContent);
+                } catch (\UnexpectedValueException $exception) {
+                    throw new \UnexpectedValueException($exception->getMessage());
                 }
 
-                if (count($characters) > 0) {
-                    $strings[] = implode("", $characters);
-                }
+                $encoding  = $encodingInfo['encoding'];
+                $delimiter = $encodingInfo['delimiter'];
+                $content   = $encodingInfo['content'];
 
-                $nofStrings = count($strings);
+                $strings = Helpers::splitString($delimiter, $content);
 
-                if ($nofStrings > 1) {
-                    $lastIndex = $nofStrings - 1;
-                    if ($strings[$lastIndex] === "") {
-                        array_pop($strings);
-                        $nofStrings--;
-                    }
-                }
-                if ($nofStrings === 1) {
+                if (count($strings) === 1) {
                     $strings = $strings[0];
                 }
 
-                if ($identifier === "TXXX") {
-                    $description = array_shift($strings);
-                    $converted   = mb_convert_encoding($description, mb_internal_encoding(), $encoding);
-                    $identifier  = "TXXX-".$converted;
-                    $value       = implode($delimiter, $strings);
-
-                    $strings = [
-                        'description' => $description,
-                        'value'       => $value,
-                    ];
-                } elseif (in_array($identifier, ["TMCL", "TIPL"]) === true) {
+                if (in_array($identifier, ["TMCL", "TIPL"]) === true) {
                     $map = [];
                     while (count($strings) > 0) {
                         $key   = array_shift($strings);
@@ -302,19 +288,7 @@ class Reader
                 $delimiter = $encodingInfo['delimiter'];
                 $content   = $encodingInfo['content'];
 
-                $characters    = str_split($content, strlen($delimiter));
-                $splitPosition = array_search($delimiter, $characters);
-
-                if ($splitPosition !== false) {
-                    $description = array_slice($characters, 0, $splitPosition);
-                    $url         = array_slice($characters, $splitPosition + 1);
-                } else {
-                    $description = $characters;
-                    $url         = [];
-                }
-
-                $description = implode("", $description);
-                $url         = implode("", $url);
+                list($description, $url) = Helpers::splitString($delimiter, $content, 2);
 
                 $converted  = mb_convert_encoding($description, mb_internal_encoding(), $encoding);
                 $identifier = "WXXX-".$converted;
@@ -326,12 +300,7 @@ class Reader
 
                 $content = $strings;
             } elseif ($identifier{0} === "W") {
-                $content = $rawContent;
-
-                $position = strpos($content, "\x00");
-                if ($position !== false) {
-                    $content = substr($content, 0, $position);
-                }
+                list($content,) = Helpers::splitString("\x00", $rawContent, 2);
 
                 if (in_array($identifier, ["WCOM", "WOAR"]) === true) {
                     if (isset($this->_frames[$identifier]) === true) {
@@ -341,9 +310,7 @@ class Reader
                     }
                 }
             } elseif ($identifier === "UFID") {
-                $position = strpos($rawContent, "\x00");
-                $owner    = substr($rawContent, 0, $position);
-                $content  = substr($rawContent, ($position + 1));
+                list($owner, $content) = Helpers::splitString("\x00", $rawContent, 2);
 
                 $identifier = "UFID-".$owner;
             } elseif (in_array($identifier{0}, ["X", "Y", "Z"]) === true) {
