@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 28.12.2018
+ * @version 02.01.2019
  */
 namespace Rhorber\ID3rw;
 
@@ -13,12 +13,9 @@ namespace Rhorber\ID3rw;
 /**
  * Class containing helper methods.
  *
- * - {@link removeSynchSafeBits}: Returns the decimal value of a synch safe integer (as binary).
- * - {@link addSynchSafeBits}: Returns the synch safe HEX value (zero padded to four bytes) of a decimal value.
- *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 28.12.2018
+ * @version 02.01.2019
  */
 class Helpers
 {
@@ -81,7 +78,7 @@ class Helpers
      * @return  string[] Result array.
      * @access  public
      * @author  Raphael Horber
-     * @version 28.10.2018
+     * @version 28.12.2018
      */
     public static function splitString(string $delimiter, string $string, int $nofElements = PHP_INT_MAX): array
     {
@@ -175,6 +172,58 @@ class Helpers
             'encoding'  => $encoding,
             'delimiter' => $delimiter,
             'content'   => $content,
+        ];
+    }
+
+    /**
+     * Determines the encoding name according to the encoding code.
+     * <br /><br />
+     * <code>
+     * $resultArray = [
+     *   'encoding'  => "Name of the encoding",
+     *   'delimiter' => "Delimiter specific to encoding (\x00 or \x00\x00)",
+     * ]
+     * </code>
+     *
+     * @param string $encodingCode Encoding code to process (binary string).
+     *
+     * @return  array                     Result array with information about the encoding.
+     * @throws  \UnexpectedValueException If the found encoding code is invalid.
+     * @access  public
+     * @author  Raphael Horber
+     * @version 02.01.2019
+     */
+    public static function getEncoding2(string $encodingCode): array
+    {
+        switch ($encodingCode) {
+            case "\x00":
+                $encoding  = "ISO-8859-1";
+                $delimiter = "\x00";
+                break;
+
+            case "\x01":
+                $encoding  = "UTF-16";
+                $delimiter = "\x00\x00";
+                break;
+
+            case "\x02":
+                $encoding  = "UTF-16BE";
+                $delimiter = "\x00\x00";
+                break;
+
+            case "\x03":
+                $encoding  = "UTF-8";
+                $delimiter = "\x00";
+                break;
+
+
+            default:
+                throw new \UnexpectedValueException("Invalid text encoding, got: ".bin2hex($encodingCode));
+        }
+
+        return [
+            'encoding'  => $encoding,
+            'delimiter' => $delimiter,
         ];
     }
 }

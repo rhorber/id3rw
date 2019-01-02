@@ -240,6 +240,73 @@ class HelpersTest extends TestCase
         // Act.
         Helpers::getEncoding("\x01\xff\xffInvalid BOM");
     }
+
+    /** @covers ::getEncoding2 */
+    public function testGetEncoding2Code0()
+    {
+        // Act.
+        $actual = Helpers::getEncoding2("\x00");
+
+        // Assert.
+        $expected = [
+            'encoding'  => "ISO-8859-1",
+            'delimiter' => "\x00",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    /** @covers ::getEncoding2 */
+    public function testGetEncoding2Code1()
+    {
+        // Act.
+        $actual = Helpers::getEncoding2("\x01");
+
+        // Assert.
+        $expected = [
+            'encoding'  => "UTF-16",
+            'delimiter' => "\x00\x00",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    /** @covers ::getEncoding2 */
+    public function testGetEncoding2Code2()
+    {
+        // Act.
+        $actual = Helpers::getEncoding2("\x02");
+
+        // Assert.
+        $expected = [
+            'encoding'  => "UTF-16BE",
+            'delimiter' => "\x00\x00",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    /** @covers ::getEncoding2 */
+    public function testGetEncoding2Code3()
+    {
+        // Act.
+        $actual = Helpers::getEncoding2("\x03");
+
+        // Assert.
+        $expected = [
+            'encoding'  => "UTF-8",
+            'delimiter' => "\x00",
+        ];
+        self::assertSame($expected, $actual);
+    }
+
+    /** @covers ::getEncoding2 */
+    public function testGetEncoding2InvalidCode()
+    {
+        // Assert.
+        self::expectException("UnexpectedValueException");
+        self::expectExceptionMessage("Invalid text encoding, got: 04");
+
+        // Act.
+        Helpers::getEncoding2("\x04Invalid Code");
+    }
 }
 
 
