@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests
  * @author  Raphael Horber
- * @version 24.12.2018
+ * @version 06.01.2019
  */
 namespace Rhorber\ID3rw\Tests;
 
@@ -20,6 +20,19 @@ use Rhorber\ID3rw\Reader;
  */
 class ReaderTest extends TestCase
 {
+    public function setUp()
+    {
+        $class = new \ReflectionClass("\\Rhorber\\ID3rw\\FrameParser\\UrlLinkFrames");
+
+        $wcom = $class->getProperty("_wcomCounter");
+        $wcom->setAccessible(true);
+        $wcom->setValue(0);
+
+        $woar = $class->getProperty("_woarCounter");
+        $woar->setAccessible(true);
+        $woar->setValue(0);
+    }
+
     public function testInvalidFlags()
     {
         // Assert.
@@ -47,15 +60,15 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "UFID-http://www.id3.org/dummy/ufid.html";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'encoding' => null,
-            'content'  => "id-42",
+        $arrayKey = "UFID-http://www.id3.org/dummy/ufid.html";
+        $array    = [
+            'frameId'    => "UFID",
+            'owner'      => "http://www.id3.org/dummy/ufid.html",
+            'identifier' => "id-42"
         ];
-        $this->assertFrameContent($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testTextFrameMultipleStrings()
@@ -65,18 +78,18 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "TIT1";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'encoding' => "UTF-16LE",
-            'content'  => [
-                "UTF-16LE Text 1",
-                "UTF-16LE Text 2",
+        $arrayKey = "TIT1";
+        $array    = [
+            'frameId'     => "TIT1",
+            'encoding'    => "UTF-16",
+            'information' => [
+                0 => "\xff\xfe".mb_convert_encoding("UTF-16LE Text 1", "UTF-16LE"),
+                1 => "\xff\xfe".mb_convert_encoding("UTF-16LE Text 2", "UTF-16LE"),
             ],
         ];
-        $this->assertTextFrame($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testTextFrameMultipleStringsTerminated()
@@ -86,18 +99,18 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "TIT2";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'encoding' => "UTF-16LE",
-            'content'  => [
-                "UTF-16LE Text 1",
-                "UTF-16LE Text 2",
+        $arrayKey = "TIT2";
+        $array    = [
+            'frameId'     => "TIT2",
+            'encoding'    => "UTF-16",
+            'information' => [
+                0 => "\xff\xfe".mb_convert_encoding("UTF-16LE Text 1", "UTF-16LE"),
+                1 => "\xff\xfe".mb_convert_encoding("UTF-16LE Text 2", "UTF-16LE"),
             ],
         ];
-        $this->assertTextFrame($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testTextFrameOneString()
@@ -107,15 +120,15 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "TIT3";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'encoding' => "UTF-16LE",
-            'content'  => "UTF-16LE Text",
+        $arrayKey = "TIT3";
+        $array    = [
+            'frameId'     => "TIT3",
+            'encoding'    => "UTF-16",
+            'information' => "\xff\xfe".mb_convert_encoding("UTF-16LE Text", "UTF-16LE"),
         ];
-        $this->assertTextFrame($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testTextFrameEmptyString()
@@ -125,15 +138,15 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "TALB";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'encoding' => "UTF-16LE",
-            'content'  => "",
+        $arrayKey = "TALB";
+        $array    = [
+            'frameId'     => "TALB",
+            'encoding'    => "UTF-16",
+            'information' => "\xff\xfe",
         ];
-        $this->assertTextFrame($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testTmclFrame()
@@ -143,18 +156,20 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "TMCL";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'encoding' => 'UTF-16LE',
-            'content'  => [
-                'Saxophone' => 'Raphael Horber',
-                'Piano'     => 'Stefan Horber',
+        $arrayKey = "TMCL";
+        $key1     = "\xff\xfe".mb_convert_encoding("Saxophone", "UTF-16LE");
+        $key2     = "\xff\xfe".mb_convert_encoding("Piano", "UTF-16LE");
+        $array    = [
+            'frameId'     => "TMCL",
+            'encoding'    => "UTF-16",
+            'information' => [
+                $key1 => "\xff\xfe".mb_convert_encoding("Raphael Horber", "UTF-16LE"),
+                $key2 => "\xff\xfe".mb_convert_encoding("Stefan Horber", "UTF-16LE"),
             ],
         ];
-        $this->assertTextFrame($frame, $expected, true);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testTxxxFrameIso()
@@ -164,18 +179,16 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "TXXX-ISO-8859-1";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'encoding' => 'ISO-8859-1',
-            'content'  => [
-                'description' => 'ISO-8859-1',
-                'value'       => 'TXXX frame with ISO encoding.',
-            ],
+        $arrayKey = "TXXX-ISO-8859-1";
+        $array    = [
+            'frameId'     => "TXXX",
+            'encoding'    => "ISO-8859-1",
+            'description' => "ISO-8859-1",
+            'value'       => "TXXX frame with ISO encoding.",
         ];
-        $this->assertTextFrame($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testTxxxFrameUtf()
@@ -185,18 +198,16 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "TXXX-UTF-16";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'encoding' => 'UTF-16BE',
-            'content'  => [
-                'description' => 'UTF-16',
-                'value'       => 'TXXX frame with UTF-16BE encoding.',
-            ],
+        $arrayKey = "TXXX-UTF-16";
+        $array    = [
+            'frameId'     => "TXXX",
+            'encoding'    => "UTF-16BE",
+            'description' => mb_convert_encoding("UTF-16", "UTF-16BE"),
+            'value'       => mb_convert_encoding("TXXX frame with UTF-16BE encoding.", "UTF-16BE"),
         ];
-        $this->assertTextFrame($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     /** Verify that a content array with only one element is reduced to a string. */
@@ -207,14 +218,14 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "WOAR";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'content' => "http://www.example.com/no-extra-text.html",
+        $arrayKey = "WOAR-1";
+        $array    = [
+            'frameId' => "WOAR",
+            'url'     => "http://www.example.com/no-extra-text.html",
         ];
-        $this->assertFrameContent($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testUrlFrameWithSuperfluousContent()
@@ -224,17 +235,14 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "WCOM";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'content' => [
-                0 => "http://www.example.com/first.html",
-                1 => "http://www.example.com/second.html",
-            ],
+        $arrayKey = "WCOM-1";
+        $array    = [
+            'frameId' => "WCOM",
+            'url'     => "http://www.example.com/first.html",
         ];
-        $this->assertFrameContent($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testWxxxFrameIso()
@@ -244,17 +252,16 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "WXXX-ISO";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'content' => [
-                'description' => "ISO",
-                'url'         => "http://www.example.com/iso.html",
-            ],
+        $arrayKey = "WXXX-ISO";
+        $array    = [
+            'frameId'     => "WXXX",
+            'encoding'    => "ISO-8859-1",
+            'description' => "ISO",
+            'url'         => "http://www.example.com/iso.html",
         ];
-        $this->assertFrameContent($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
     public function testWxxxFrameUtf()
@@ -264,78 +271,25 @@ class ReaderTest extends TestCase
         $frames = $reader->getFrames();
 
         // Assert.
-        $identifier = "WXXX-UTF-16";
-        $this->assertFrameExists($frames, $identifier);
-
-        $frame    = $frames[$identifier];
-        $expected = [
-            'content' => [
-                'description' => mb_convert_encoding("UTF-16", "UTF-16LE"),
-                'url'         => "http://www.example.com/utf-16-html",
-            ],
+        $arrayKey = "WXXX-UTF-16";
+        $array    = [
+            'frameId'     => "WXXX",
+            'encoding'    => "UTF-16",
+            'description' => "\xff\xfe".mb_convert_encoding("UTF-16", "UTF-16LE"),
+            'url'         => "http://www.example.com/utf-16.html",
         ];
-        $this->assertFrameContent($frame, $expected);
+
+        self::assertArrayHasKey($arrayKey, $frames);
+        $this->assertFrame($array, $frames[$arrayKey]);
     }
 
 
-    private function assertFrameExists($frames, $identifier)
+    private function assertFrame($expectedFrame, $parsedFrame)
     {
-        self::assertArrayHasKey($identifier, $frames);
-        self::assertSame(substr($identifier, 0, 4), $frames[$identifier]['identifier']);
-    }
+        $actualFrame = $parsedFrame;
+        unset($actualFrame['rawContent']);
 
-    private function assertFrameContent($frame, $expected)
-    {
-        self::assertArrayHasKey('content', $expected, "Expected array does not have key 'content'.");
-        self::assertArrayHasKey('content', $frame, "Frame does not have key 'content'.");
-
-        $expectedContent = $expected['content'];
-        $frameContent    = $frame['content'];
-
-        if (is_array($expectedContent) === true) {
-            self::assertTrue(is_array($expectedContent), "Expected content to be of type 'array'.");
-            self::assertCount(count($expectedContent), $frameContent);
-
-            foreach ($expectedContent as $key => $value) {
-                self::assertArrayHasKey($key, $frameContent);
-                self::assertSame($value, $frameContent[$key]);
-            }
-        } elseif (is_string($expectedContent) === true) {
-            self::assertTrue(is_string($expectedContent), "Expected content to be of type 'string'.");
-            self::assertSame($expectedContent, $frameContent);
-        }
-    }
-
-    private function assertTextFrame($frame, $expected, $convertKeys = false)
-    {
-        self::assertArrayHasKey('encoding', $expected, "Expected array does not have key 'encoding'.");
-        self::assertArrayHasKey('content', $expected, "Expected array does not have key 'content'.");
-        self::assertArrayHasKey('encoding', $frame, "Frame does not have key 'encoding'.");
-        self::assertArrayHasKey('content', $frame, "Frame does not have key 'content'.");
-
-        $encoding = $expected['encoding'];
-        self::assertSame($encoding, $frame['encoding'], "Frame's encoding does not match expected one.");
-
-        $expectedContent = $expected['content'];
-        $frameContent    = $frame['content'];
-
-        if (is_array($expectedContent) === true) {
-            self::assertTrue(is_array($expectedContent), "Expected content to be of type 'array'.");
-            self::assertCount(count($expectedContent), $frameContent);
-
-            foreach ($expectedContent as $key => $value) {
-                if ($convertKeys === true) {
-                    $key = mb_convert_encoding($key, $encoding);
-                }
-                $value = mb_convert_encoding($value, $encoding);
-
-                self::assertArrayHasKey($key, $frameContent);
-                self::assertSame($value, $frameContent[$key]);
-            }
-        } elseif (is_string($expectedContent) === true) {
-            self::assertTrue(is_string($expectedContent), "Expected content to be of type 'string'.");
-            self::assertSame(mb_convert_encoding($expectedContent, $encoding), $frameContent);
-        }
+        self::assertSame($expectedFrame, $actualFrame);
     }
 }
 

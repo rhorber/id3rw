@@ -5,9 +5,11 @@
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 28.12.2018
+ * @version 06.01.2019
  */
 namespace Rhorber\ID3rw;
+
+use Rhorber\ID3rw\FrameParser\FrameParserFactory;
 
 
 /**
@@ -21,7 +23,7 @@ namespace Rhorber\ID3rw;
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 28.12.2018
+ * @version 06.01.2019
  */
 class Reader
 {
@@ -190,7 +192,7 @@ class Reader
      * @throws  \UnexpectedValueException If the tag does contain unsupported features (flags, encoding, BOM).
      * @access  private
      * @author  Raphael Horber
-     * @version 28.12.2018
+     * @version 06.01.2019
      */
     private function _parseFrames()
     {
@@ -200,7 +202,7 @@ class Reader
         while (strlen($stringToParse) > 0) {
             $header = substr($stringToParse, 0, 10);
 
-            if (substr($header, 0, 1) === "\x00") {
+            if ($header{0} === "\x00") {
                 // Padding reached: End loop.
                 $stringToParse = "";
                 continue;
@@ -225,130 +227,14 @@ class Reader
             $contentKey = null;
 
             // TODO: Improve/Add parsing of other frames than "text".
-            // TODO: Text frames: Support multiple strings (v2.4.0).
-            if ($identifier === "TXXX") {
-                try {
-                    $encodingInfo = Helpers::getEncoding($rawContent);
-                } catch (\UnexpectedValueException $exception) {
-                    throw new \UnexpectedValueException($exception->getMessage());
-                }
 
-                $encoding  = $encodingInfo['encoding'];
-                $delimiter = $encodingInfo['delimiter'];
-                $content   = $encodingInfo['content'];
+            $parser = FrameParserFactory::createParser($identifier);
+            $parser->parse($rawContent);
 
-                list($description, $value) = Helpers::splitString($delimiter, $content, 2);
+            $arrayKey   = $parser->getArrayKey();
+            $frameArray = $parser->getFrameArray();
 
-                $converted  = mb_convert_encoding($description, mb_internal_encoding(), $encoding);
-                $identifier = "TXXX-".$converted;
-
-                $strings = [
-                    'description' => $description,
-                    'value'       => $value,
-                ];
-
-                $content = $strings;
-            } elseif ($identifier{0} === "T") {
-                try {
-                    $encodingInfo = Helpers::getEncoding($rawContent);
-                } catch (\UnexpectedValueException $exception) {
-                    throw new \UnexpectedValueException($exception->getMessage());
-                }
-
-                $encoding  = $encodingInfo['encoding'];
-                $delimiter = $encodingInfo['delimiter'];
-                $content   = $encodingInfo['content'];
-
-                $strings = Helpers::splitString($delimiter, $content);
-
-                if (count($strings) === 1) {
-                    $strings = $strings[0];
-                }
-
-                if (in_array($identifier, ["TMCL", "TIPL"]) === true) {
-                    $map = [];
-                    while (count($strings) > 0) {
-                        $key   = array_shift($strings);
-                        $value = array_shift($strings);
-
-                        $map[$key] = $value;
-                    }
-                    $strings = $map;
-                }
-
-                $content = $strings;
-            } elseif ($identifier === "WXXX") {
-                try {
-                    $encodingInfo = Helpers::getEncoding($rawContent);
-                } catch (\UnexpectedValueException $exception) {
-                    throw new \UnexpectedValueException($exception->getMessage());
-                }
-
-                $encoding  = $encodingInfo['encoding'];
-                $delimiter = $encodingInfo['delimiter'];
-                $content   = $encodingInfo['content'];
-
-                list($description, $url) = Helpers::splitString($delimiter, $content, 2);
-
-                $converted  = mb_convert_encoding($description, mb_internal_encoding(), $encoding);
-                $identifier = "WXXX-".$converted;
-
-                $strings = [
-                    'description' => $description,
-                    'url'         => $url,
-                ];
-
-                $content = $strings;
-            } elseif ($identifier{0} === "W") {
-                list($content,) = Helpers::splitString("\x00", $rawContent, 2);
-
-                if (in_array($identifier, ["WCOM", "WOAR"]) === true) {
-                    if (isset($this->_frames[$identifier]) === true) {
-                        $contentKey = count($this->_frames[$identifier]['content']);
-                    } else {
-                        $contentKey = 0;
-                    }
-                }
-            } elseif ($identifier === "UFID") {
-                list($owner, $content) = Helpers::splitString("\x00", $rawContent, 2);
-
-                $identifier = "UFID-".$owner;
-            } elseif (in_array($identifier{0}, ["X", "Y", "Z"]) === true) {
-                // TODO: Add info: Experimental Frame.
-                $content = $rawContent;
-            } elseif (in_array($identifier, ["MCDI"])) {
-                // TODO: MCDI requires TRCK (add warning if missing)
-                $content = $rawContent;
-            } else {
-                $content = null;
-            }
-
-            if ($contentKey !== null) {
-                if (isset($this->_frames[$identifier]) === true) {
-                    $frameContent = $this->_frames[$identifier]['content'];
-                    $frameRaw     = $this->_frames[$identifier]['raw'];
-                } else {
-                    $frameContent = [];
-                    $frameRaw     = [];
-                }
-                $frameContent[$contentKey] = $content;
-                $frameRaw[$contentKey]     = $rawContent;
-
-                $content    = $frameContent;
-                $rawContent = $frameRaw;
-            }
-
-            $element = [
-                'identifier' => substr($identifier, 0, 4),
-                'content'    => $content,
-                'raw'        => $rawContent,
-            ];
-
-            if ($encoding !== null) {
-                $element['encoding'] = $encoding;
-            }
-
-            $this->_frames[$identifier] = $element;
+            $this->_frames[$arrayKey] = $frameArray;
 
             // Frame header + frame size.
             $totalFrameSize = 10 + $frameSize;

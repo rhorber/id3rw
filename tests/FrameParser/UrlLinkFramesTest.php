@@ -20,6 +20,19 @@ use Rhorber\ID3rw\FrameParser\UrlLinkFrames;
  */
 class UrlLinkFramesTest extends TestCase
 {
+    public function setUp()
+    {
+        $class = new \ReflectionClass("\\Rhorber\\ID3rw\\FrameParser\\UrlLinkFrames");
+
+        $wcom = $class->getProperty("_wcomCounter");
+        $wcom->setAccessible(true);
+        $wcom->setValue(0);
+
+        $woar = $class->getProperty("_woarCounter");
+        $woar->setAccessible(true);
+        $woar->setValue(0);
+    }
+
     public function testValid()
     {
         // Arrange.
