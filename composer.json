@@ -26,6 +26,8 @@
         }
     },
     "autoload-dev": {
-        "Rhorber\\ID3rw\\Tests": "tests/"
+        "psr-4": {
+            "Rhorber\\ID3rw\\Tests\\": "tests/"
+        }
     }
 }
