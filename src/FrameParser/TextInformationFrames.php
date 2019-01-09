@@ -5,9 +5,8 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
-
 namespace Rhorber\ID3rw\FrameParser;
 
 use Rhorber\ID3rw\Helpers;
@@ -18,7 +17,7 @@ use Rhorber\ID3rw\Helpers;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 class TextInformationFrames extends BaseFrameParser
 {
@@ -47,18 +46,40 @@ class TextInformationFrames extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 09.01.2019
      */
     public function parse(string $rawContent)
     {
         parent::parse($rawContent);
 
-        $encoding = Helpers::getEncoding2($rawContent{0});
+        $encoding = $this->tagParser->getEncoding($rawContent{0});
         $content  = substr($rawContent, 1);
         $strings  = Helpers::splitString($encoding['delimiter'], $content);
 
-        if (count($strings) === 1) {
+        if ($this->tagParser->getMajorVersion() === 4) {
+            $strings = $this->_processStringsVersion4($strings);
+        } elseif ($this->tagParser->getMajorVersion() === 3) {
             $strings = $strings[0];
+        }
+
+        $this->encoding    = $encoding['encoding'];
+        $this->information = $strings;
+    }
+
+    /**
+     * Processes the parsed string according to the Version 2.4.0 specification and returns the result.
+     *
+     * @param string[] $strings Parsed strings to process.
+     *
+     * @return  string|string[]
+     * @access  public
+     * @author  Raphael Horber
+     * @version 09.01.2019
+     */
+    private function _processStringsVersion4(array $strings)
+    {
+        if (count($strings) === 1) {
+            return $strings[0];
         }
 
         if (in_array($this->frameId, ["TMCL", "TIPL"]) === true) {
@@ -72,8 +93,7 @@ class TextInformationFrames extends BaseFrameParser
             $strings = $map;
         }
 
-        $this->encoding    = $encoding['encoding'];
-        $this->information = $strings;
+        return $strings;
     }
 }
 

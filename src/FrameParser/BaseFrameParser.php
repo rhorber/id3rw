@@ -5,10 +5,11 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
-
 namespace Rhorber\ID3rw\FrameParser;
+
+use Rhorber\ID3rw\TagParser\TagParserInterface;
 
 
 /**
@@ -16,10 +17,18 @@ namespace Rhorber\ID3rw\FrameParser;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 class BaseFrameParser
 {
+    /**
+     * Tag parser instance.
+     *
+     * @access protected
+     * @var    TagParserInterface
+     */
+    protected $tagParser;
+
     /**
      * Frame's "Frame ID".
      *
@@ -40,15 +49,17 @@ class BaseFrameParser
     /**
      * Constructor: Initializes the parser.
      *
+     * @param TagParserInterface $tagParser Tag parser instance.
      * @param string $frameId Frame ID of the frame to parse.
      *
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 09.01.2019
      */
-    public function __construct(string $frameId)
+    public function __construct(TagParserInterface $tagParser, string $frameId)
     {
-        $this->frameId = $frameId;
+        $this->tagParser = $tagParser;
+        $this->frameId   = $frameId;
     }
 
     /**
@@ -85,22 +96,22 @@ class BaseFrameParser
      * @return  array Frame's fields.
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 09.01.2019
      */
     public function getFrameArray(): array
     {
-        try {
-            $reflectionClass = new \ReflectionClass($this);
-        } catch (\ReflectionException $e) {
-            return [];
-        }
-
-        $privateProperties = $reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC);
-
         $result = [
             'frameId'    => $this->frameId,
             'rawContent' => $this->rawContent,
         ];
+
+        try {
+            $reflectionClass = new \ReflectionClass($this);
+        } catch (\ReflectionException $e) {
+            return $result;
+        }
+
+        $privateProperties = $reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC);
 
         foreach ($privateProperties as $property) {
             $name  = $property->getName();

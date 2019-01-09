@@ -5,18 +5,19 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
-
 namespace Rhorber\ID3rw\FrameParser;
 
 
 /**
- * Class for parsing SIGN (Signature) frames.
+ * Class for parsing "SIGN" (Signature) frames.
+ *
+ * The "SIGN" frame was added in Version 2.4.0.
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 class SignFrame extends BaseFrameParser
 {
@@ -52,18 +53,6 @@ class SignFrame extends BaseFrameParser
      */
     private $_arrayKey = "";
 
-
-    /**
-     * Constructor: Initializes the parser.
-     *
-     * @access  public
-     * @author  Raphael Horber
-     * @version 02.01.2019
-     */
-    public function __construct()
-    {
-        parent::__construct("SIGN");
-    }
 
     /**
      * Parses the frame according to spec.

@@ -5,22 +5,29 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
 use PHPUnit\Framework\TestCase;
 use Rhorber\ID3rw\FrameParser\WxxxFrame;
+use Rhorber\ID3rw\TagParser\TagParserInterface;
 
 
 /**
  * Class WxxxFrameTest.
  *
+ * The frame specification has no differences between Version 2.3.0 and 2.4.0.
+ *
  * @coversDefaultClass \Rhorber\ID3rw\FrameParser\WxxxFrame
  */
 class WxxxFrameTest extends TestCase
 {
-    public function testIso()
+    /** @var string */
+    private static $_frameId = "WXXX";
+
+    /** @dataProvider tagParserDataProvider */
+    public function testIso(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = "ISO-8859-1";
@@ -28,13 +35,13 @@ class WxxxFrameTest extends TestCase
         $rawContent  = "\x00".$description."\x00".$url;
 
         // Act.
-        $parser = new WxxxFrame();
+        $parser = new WxxxFrame($tagParser, self::$_frameId);
         $parser->parse($rawContent);
 
         // Assert.
         $arrayKey = "WXXX-ISO-8859-1";
         $array    = [
-            'frameId'     => "WXXX",
+            'frameId'     => self::$_frameId,
             'rawContent'  => $rawContent,
             'encoding'    => "ISO-8859-1",
             'description' => $description,
@@ -44,7 +51,8 @@ class WxxxFrameTest extends TestCase
         $this->assertResult($parser, $arrayKey, $array);
     }
 
-    public function testUtf()
+    /** @dataProvider tagParserDataProvider */
+    public function testUtf(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = mb_convert_encoding("UTF-16LE", "UTF-16LE");
@@ -52,13 +60,13 @@ class WxxxFrameTest extends TestCase
         $rawContent  = "\x01\xff\xfe".$description."\x00\x00".$url;
 
         // Act.
-        $parser = new WxxxFrame();
+        $parser = new WxxxFrame($tagParser, self::$_frameId);
         $parser->parse($rawContent);
 
         // Assert.
         $arrayKey = "WXXX-UTF-16LE";
         $array    = [
-            'frameId'     => "WXXX",
+            'frameId'     => self::$_frameId,
             'rawContent'  => $rawContent,
             'encoding'    => "UTF-16",
             'description' => "\xff\xfe".$description,
@@ -66,6 +74,15 @@ class WxxxFrameTest extends TestCase
         ];
 
         $this->assertResult($parser, $arrayKey, $array);
+    }
+
+    /** Returns parsers of the different versions. */
+    public function tagParserDataProvider()
+    {
+        return [
+            'Version 2.3.0' => [$GLOBALS['TAG_PARSER_VERSION_3']],
+            'Version 2.4.0' => [$GLOBALS['TAG_PARSER_VERSION_4']],
+        ];
     }
 
 

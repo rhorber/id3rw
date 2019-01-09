@@ -5,20 +5,21 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
-
 namespace Rhorber\ID3rw\FrameParser;
 
 use Rhorber\ID3rw\Helpers;
 
 
 /**
- * Class for parsing APIC (Attached picture) frames.
+ * Class for parsing "APIC" (Attached picture) frames.
+ *
+ * The frame specification has no differences between Version 2.3.0 and 2.4.0.
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 class ApicFrame extends BaseFrameParser
 {
@@ -64,18 +65,6 @@ class ApicFrame extends BaseFrameParser
 
 
     /**
-     * Constructor: Initializes the parser.
-     *
-     * @access  public
-     * @author  Raphael Horber
-     * @version 02.01.2019
-     */
-    public function __construct()
-    {
-        parent::__construct("APIC");
-    }
-
-    /**
      * Parses the frame according to spec.
      *
      * @param string $rawContent Content to parse (binary string).
@@ -83,13 +72,13 @@ class ApicFrame extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 09.01.2019
      */
     public function parse(string $rawContent)
     {
         parent::parse($rawContent);
 
-        $encoding  = Helpers::getEncoding2($rawContent{0});
+        $encoding  = $this->tagParser->getEncoding($rawContent{0});
         $content   = substr($rawContent, 1);
         $typeParts = Helpers::splitString("\x00", $content, 2);
 

@@ -5,22 +5,29 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
 use PHPUnit\Framework\TestCase;
 use Rhorber\ID3rw\FrameParser\ApicFrame;
+use Rhorber\ID3rw\TagParser\TagParserInterface;
 
 
 /**
  * Class ApicFrameTest.
  *
+ * The frame specification has no differences between Version 2.3.0 and 2.4.0.
+ *
  * @coversDefaultClass \Rhorber\ID3rw\FrameParser\ApicFrame
  */
 class ApicFrameTest extends TestCase
 {
-    public function testIso()
+    /** @var string */
+    private static $_frameId = "APIC";
+
+    /** @dataProvider tagParserDataProvider */
+    public function testIso(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = "ISO-8859-1";
@@ -28,13 +35,13 @@ class ApicFrameTest extends TestCase
         $rawContent  = "\x00image/png\x00\x03".$description."\x00".$pictureData;
 
         // Act.
-        $parser = new ApicFrame();
+        $parser = new ApicFrame($tagParser, self::$_frameId);
         $parser->parse($rawContent);
 
         // Assert.
         $arrayKey = "APIC-ISO-8859-1";
         $array    = [
-            'frameId'     => "APIC",
+            'frameId'     => self::$_frameId,
             'rawContent'  => $rawContent,
             'encoding'    => "ISO-8859-1",
             'mimeType'    => "image/png",
@@ -46,7 +53,8 @@ class ApicFrameTest extends TestCase
         $this->assertResult($parser, $arrayKey, $array);
     }
 
-    public function testUtf()
+    /** @dataProvider tagParserDataProvider */
+    public function testUtf(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = mb_convert_encoding("UTF-16LE", "UTF-16LE");
@@ -54,13 +62,13 @@ class ApicFrameTest extends TestCase
         $rawContent  = "\x01image/jpeg\x00\x05\xff\xfe".$description."\x00\x00".$pictureData;
 
         // Act.
-        $parser = new ApicFrame();
+        $parser = new ApicFrame($tagParser, self::$_frameId);
         $parser->parse($rawContent);
 
         // Assert.
         $arrayKey = "APIC-UTF-16LE";
         $array    = [
-            'frameId'     => "APIC",
+            'frameId'     => self::$_frameId,
             'rawContent'  => $rawContent,
             'encoding'    => "UTF-16",
             'mimeType'    => "image/jpeg",
@@ -72,7 +80,8 @@ class ApicFrameTest extends TestCase
         $this->assertResult($parser, $arrayKey, $array);
     }
 
-    public function testMimeTypeOmitted()
+    /** @dataProvider tagParserDataProvider */
+    public function testMimeTypeOmitted(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = "No MIME type";
@@ -80,13 +89,13 @@ class ApicFrameTest extends TestCase
         $rawContent  = "\x00\x00\x03".$description."\x00".$pictureData;
 
         // Act.
-        $parser = new ApicFrame();
+        $parser = new ApicFrame($tagParser, self::$_frameId);
         $parser->parse($rawContent);
 
         // Assert.
         $arrayKey = "APIC-No MIME type";
         $array    = [
-            'frameId'     => "APIC",
+            'frameId'     => self::$_frameId,
             'rawContent'  => $rawContent,
             'encoding'    => "ISO-8859-1",
             'mimeType'    => "image/",
@@ -96,6 +105,15 @@ class ApicFrameTest extends TestCase
         ];
 
         $this->assertResult($parser, $arrayKey, $array);
+    }
+
+    /** Returns parsers of the different versions. */
+    public function tagParserDataProvider()
+    {
+        return [
+            'Version 2.3.0' => [$GLOBALS['TAG_PARSER_VERSION_3']],
+            'Version 2.4.0' => [$GLOBALS['TAG_PARSER_VERSION_4']],
+        ];
     }
 
 

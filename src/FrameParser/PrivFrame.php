@@ -5,20 +5,21 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
-
 namespace Rhorber\ID3rw\FrameParser;
 
 use Rhorber\ID3rw\Helpers;
 
 
 /**
- * Class for parsing PRIV (Private) frames.
+ * Class for parsing "PRIV" (Private) frames.
+ *
+ * The frame specification has no differences between Version 2.3.0 and 2.4.0.
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 class PrivFrame extends BaseFrameParser
 {
@@ -54,18 +55,6 @@ class PrivFrame extends BaseFrameParser
      */
     private $_arrayKey = "";
 
-
-    /**
-     * Constructor: Initializes the parser.
-     *
-     * @access  public
-     * @author  Raphael Horber
-     * @version 02.01.2019
-     */
-    public function __construct()
-    {
-        parent::__construct("PRIV");
-    }
 
     /**
      * Parses the frame according to spec.

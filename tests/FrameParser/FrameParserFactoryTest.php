@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 06.01.2019
+ * @version 09.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -20,167 +20,352 @@ use Rhorber\ID3rw\FrameParser\FrameParserFactory;
  */
 class FrameParserFactoryTest extends TestCase
 {
-    public function testUfidFrame()
+    // region properties, and set up functions
+    /** @var FrameParserFactory */
+    private static $_factoryVersion3 = null;
+    /** @var FrameParserFactory */
+    private static $_factoryVersion4 = null;
+
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        self::$_factoryVersion3 = new FrameParserFactory($GLOBALS['TAG_PARSER_VERSION_3']);
+        self::$_factoryVersion4 = new FrameParserFactory($GLOBALS['TAG_PARSER_VERSION_4']);
+    }
+    // endregion
+
+
+    // region Version 2.3.0
+    public function testUfidFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("UFID");
+        $parser = self::$_factoryVersion3->createParser("UFID");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UfidFrame::class, $parser);
     }
 
-    public function testTit1Frame()
+    public function testTit1FrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("TIT1");
+        $parser = self::$_factoryVersion3->createParser("TIT1");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
-    public function testTit2Frame()
+    public function testTit2FrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("TIT2");
+        $parser = self::$_factoryVersion3->createParser("TIT2");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
-    public function testTalbFrame()
+    public function testTalbFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("TALB");
+        $parser = self::$_factoryVersion3->createParser("TALB");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
-    public function testTxxxFrame()
+    public function testTxxxFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("TXXX");
+        $parser = self::$_factoryVersion3->createParser("TXXX");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TxxxFrame::class, $parser);
     }
 
-    public function testWcomFrame()
+    public function testWcomFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("WCOM");
+        $parser = self::$_factoryVersion3->createParser("WCOM");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UrlLinkFrames::class, $parser);
     }
 
-    public function testWcopFrame()
+    public function testWcopFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("WCOP");
+        $parser = self::$_factoryVersion3->createParser("WCOP");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UrlLinkFrames::class, $parser);
     }
 
-    public function testWxxxFrame()
+    public function testWxxxFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("WXXX");
+        $parser = self::$_factoryVersion3->createParser("WXXX");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\WxxxFrame::class, $parser);
     }
 
-    public function testMcdiFrame()
+    public function testMcdiFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("MCDI");
+        $parser = self::$_factoryVersion3->createParser("MCDI");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\BaseFrameParser::class, $parser);
     }
 
-    public function testEtcoFrame()
+    public function testEtcoFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("ETCO");
+        $parser = self::$_factoryVersion3->createParser("ETCO");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\EtcoFrame::class, $parser);
     }
 
-    public function testUsltFrame()
+    public function testUsltFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("USLT");
+        $parser = self::$_factoryVersion3->createParser("USLT");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UsltFrame::class, $parser);
     }
 
-    public function testCommFrame()
+    public function testCommFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("COMM");
+        $parser = self::$_factoryVersion3->createParser("COMM");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\CommFrame::class, $parser);
     }
 
-    public function testApicFrame()
+    public function testApicFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("APIC");
+        $parser = self::$_factoryVersion3->createParser("APIC");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\ApicFrame::class, $parser);
     }
 
-    public function testPcntFrame()
+    public function testPcntFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("PCNT");
+        $parser = self::$_factoryVersion3->createParser("PCNT");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PcntFrame::class, $parser);
     }
 
-    public function testPopmFrame()
+    public function testPopmFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("POPM");
+        $parser = self::$_factoryVersion3->createParser("POPM");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PopmFrame::class, $parser);
     }
 
-    public function testUserFrame()
+    public function testUserFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("USER");
+        $parser = self::$_factoryVersion3->createParser("USER");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UserFrame::class, $parser);
     }
 
-    public function testPrivFrame()
+    public function testPrivFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("PRIV");
+        $parser = self::$_factoryVersion3->createParser("PRIV");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PrivFrame::class, $parser);
     }
 
-    public function testSignFrame()
+    /** Verifies that "SIGN" in Version 2.3.0 does not produce a specific parser. */
+    public function testSignFrameVersion3()
     {
         // Act.
-        $parser = FrameParserFactory::createParser("SIGN");
+        $parser = self::$_factoryVersion3->createParser("SIGN");
+
+        // Assert.
+        // The "SIGN" frame was added in Version 2.4.0.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\BaseFrameParser::class, $parser);
+    }
+    // endregion
+
+
+    // region Version 2.4.0
+    public function testUfidFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("UFID");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UfidFrame::class, $parser);
+    }
+
+    public function testTit1FrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("TIT1");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
+    }
+
+    public function testTit2FrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("TIT2");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
+    }
+
+    public function testTalbFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("TALB");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
+    }
+
+    public function testTxxxFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("TXXX");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TxxxFrame::class, $parser);
+    }
+
+    public function testWcomFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("WCOM");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UrlLinkFrames::class, $parser);
+    }
+
+    public function testWcopFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("WCOP");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UrlLinkFrames::class, $parser);
+    }
+
+    public function testWxxxFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("WXXX");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\WxxxFrame::class, $parser);
+    }
+
+    public function testMcdiFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("MCDI");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\BaseFrameParser::class, $parser);
+    }
+
+    public function testEtcoFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("ETCO");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\EtcoFrame::class, $parser);
+    }
+
+    public function testUsltFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("USLT");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UsltFrame::class, $parser);
+    }
+
+    public function testCommFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("COMM");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\CommFrame::class, $parser);
+    }
+
+    public function testApicFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("APIC");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\ApicFrame::class, $parser);
+    }
+
+    public function testPcntFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("PCNT");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PcntFrame::class, $parser);
+    }
+
+    public function testPopmFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("POPM");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PopmFrame::class, $parser);
+    }
+
+    public function testUserFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("USER");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UserFrame::class, $parser);
+    }
+
+    public function testPrivFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("PRIV");
+
+        // Assert.
+        self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PrivFrame::class, $parser);
+    }
+
+    public function testSignFrameVersion4()
+    {
+        // Act.
+        $parser = self::$_factoryVersion4->createParser("SIGN");
 
         // Assert.
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\SignFrame::class, $parser);
     }
+    // endregion
 }
 
 

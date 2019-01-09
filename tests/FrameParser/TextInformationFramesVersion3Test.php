@@ -1,25 +1,36 @@
 <?php
 
 /**
- * Test class for class TextInformationFrames.
+ * Test class for class TextInformationFrames, Version 2.3.0.
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
 use PHPUnit\Framework\TestCase;
 use Rhorber\ID3rw\FrameParser\TextInformationFrames;
+use Rhorber\ID3rw\TagParser\TagParserInterface;
 
 
 /**
- * Class TextInformationFramesTest.
+ * Class TextInformationFramesVersion3Test.
  *
  * @coversDefaultClass \Rhorber\ID3rw\FrameParser\TextInformationFrames
  */
-class TextInformationFramesTest extends TestCase
+class TextInformationFramesVersion3Test extends TestCase
 {
+    /** @var TagParserInterface */
+    private static $_tagParser;
+
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        self::$_tagParser = $GLOBALS['TAG_PARSER_VERSION_3'];
+    }
+
     public function testIsoOneString()
     {
         // Arrange.
@@ -28,7 +39,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent  = "\x00".$information;
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -50,7 +61,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent  = "\x00".$information."\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -75,7 +86,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent  = "\x00".$information[0]."\x00".$information[1];
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -83,7 +94,7 @@ class TextInformationFramesTest extends TestCase
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
             'encoding'    => "ISO-8859-1",
-            'information' => $information,
+            'information' => $information[0],
         ];
 
         $this->assertResult($parser, $identifier, $array);
@@ -100,7 +111,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent  = "\x00".$information[0]."\x00".$information[1]."\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -108,7 +119,7 @@ class TextInformationFramesTest extends TestCase
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
             'encoding'    => "ISO-8859-1",
-            'information' => $information,
+            'information' => $information[0],
         ];
 
         $this->assertResult($parser, $identifier, $array);
@@ -121,7 +132,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent = "\x00\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -143,7 +154,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent  = "\x01\xff\xfe".$information;
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -165,7 +176,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent  = "\x01\xff\xfe".$information."\x00\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -190,7 +201,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent  = "\x01\xff\xfe".$information[0]."\x00\x00\xff\xfe".$information[1];
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -198,10 +209,7 @@ class TextInformationFramesTest extends TestCase
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
             'encoding'    => "UTF-16",
-            'information' => [
-                "\xff\xfe".$information[0],
-                "\xff\xfe".$information[1],
-            ],
+            'information' => "\xff\xfe".$information[0],
         ];
 
         $this->assertResult($parser, $identifier, $array);
@@ -218,7 +226,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent  = "\x01\xff\xfe".$information[0]."\x00\x00\xff\xfe".$information[1]."\x00\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -226,10 +234,7 @@ class TextInformationFramesTest extends TestCase
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
             'encoding'    => "UTF-16",
-            'information' => [
-                "\xff\xfe".$information[0],
-                "\xff\xfe".$information[1],
-            ],
+            'information' => "\xff\xfe".$information[0],
         ];
 
         $this->assertResult($parser, $identifier, $array);
@@ -242,7 +247,7 @@ class TextInformationFramesTest extends TestCase
         $rawContent = "\x01\xff\xfe\x00\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
@@ -270,18 +275,16 @@ class TextInformationFramesTest extends TestCase
         $rawContent  .= $information[2]."\x00".$information[3]."\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
+        // "TMCL" frame does not exist in Version 2.3.0, thus the expected result is the first string.
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
             'encoding'    => "ISO-8859-1",
-            'information' => [
-                $information[0] => $information[1],
-                $information[2] => $information[3],
-            ],
+            'information' => $information[0],
         ];
 
         $this->assertResult($parser, $identifier, $array);
@@ -301,18 +304,16 @@ class TextInformationFramesTest extends TestCase
         $rawContent  .= "\xff\xfe".$information[2]."\x00\x00\xff\xfe".$information[3]."\x00\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
+        // "TMCL" frame does not exist in Version 2.3.0, thus the expected result is the first string.
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
             'encoding'    => "UTF-16",
-            'information' => [
-                "\xff\xfe".$information[0] => "\xff\xfe".$information[1],
-                "\xff\xfe".$information[2] => "\xff\xfe".$information[3],
-            ],
+            'information' => "\xff\xfe".$information[0],
         ];
 
         $this->assertResult($parser, $identifier, $array);
@@ -332,18 +333,16 @@ class TextInformationFramesTest extends TestCase
         $rawContent  .= $information[2]."\x00".$information[3]."\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
+        // "TIPL" frame does not exist in Version 2.3.0, thus the expected result is the first string.
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
             'encoding'    => "ISO-8859-1",
-            'information' => [
-                $information[0] => $information[1],
-                $information[2] => $information[3],
-            ],
+            'information' => $information[0],
         ];
 
         $this->assertResult($parser, $identifier, $array);
@@ -363,18 +362,16 @@ class TextInformationFramesTest extends TestCase
         $rawContent  .= "\xff\xfe".$information[2]."\x00\x00\xff\xfe".$information[3]."\x00\x00";
 
         // Act.
-        $parser = new TextInformationFrames($identifier);
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
         $parser->parse($rawContent);
 
         // Assert.
+        // "TIPL" frame does not exist in Version 2.3.0, thus the expected result is the first string.
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
             'encoding'    => "UTF-16",
-            'information' => [
-                "\xff\xfe".$information[0] => "\xff\xfe".$information[1],
-                "\xff\xfe".$information[2] => "\xff\xfe".$information[3],
-            ],
+            'information' => "\xff\xfe".$information[0],
         ];
 
         $this->assertResult($parser, $identifier, $array);

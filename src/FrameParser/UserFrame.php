@@ -5,20 +5,17 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
-
 namespace Rhorber\ID3rw\FrameParser;
-
-use Rhorber\ID3rw\Helpers;
 
 
 /**
- * Class for parsing USER (Terms of use) frames.
+ * Class for parsing "USER" (Terms of use) frames.
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 class UserFrame extends BaseFrameParser
 {
@@ -48,18 +45,6 @@ class UserFrame extends BaseFrameParser
 
 
     /**
-     * Constructor: Initializes the parser.
-     *
-     * @access  public
-     * @author  Raphael Horber
-     * @version 02.01.2019
-     */
-    public function __construct()
-    {
-        parent::__construct("USER");
-    }
-
-    /**
      * Parses the frame according to spec.
      *
      * @param string $rawContent Content to parse (binary string).
@@ -67,13 +52,13 @@ class UserFrame extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 09.01.2019
      */
     public function parse(string $rawContent)
     {
         parent::parse($rawContent);
 
-        $encoding = Helpers::getEncoding2($rawContent{0});
+        $encoding = $this->tagParser->getEncoding($rawContent{0});
         $language = substr($rawContent, 1, 3);
         $content  = substr($rawContent, 4);
 

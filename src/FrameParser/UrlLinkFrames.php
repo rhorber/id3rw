@@ -5,9 +5,8 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
-
 namespace Rhorber\ID3rw\FrameParser;
 
 use Rhorber\ID3rw\Helpers;
@@ -16,9 +15,11 @@ use Rhorber\ID3rw\Helpers;
 /**
  * Class for parsing URL link frames (W000 - WZZZ).
  *
+ * The frame specification has no differences between Version 2.3.0 and 2.4.0.
+ *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 class UrlLinkFrames extends BaseFrameParser
 {

@@ -5,20 +5,21 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
-
 namespace Rhorber\ID3rw\FrameParser;
 
 use Rhorber\ID3rw\Helpers;
 
 
 /**
- * Class for parsing WXXX (User defined URL link) frames.
+ * Class for parsing "WXXX" (User defined URL link) frames.
+ *
+ * The frame specification has no differences between Version 2.3.0 and 2.4.0.
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 02.01.2019
+ * @version 09.01.2019
  */
 class WxxxFrame extends BaseFrameParser
 {
@@ -48,18 +49,6 @@ class WxxxFrame extends BaseFrameParser
 
 
     /**
-     * Constructor: Initializes the parser.
-     *
-     * @access  public
-     * @author  Raphael Horber
-     * @version 02.01.2019
-     */
-    public function __construct()
-    {
-        parent::__construct("WXXX");
-    }
-
-    /**
      * Parses the frame according to spec.
      *
      * @param string $rawContent Content to parse (binary string).
@@ -67,13 +56,13 @@ class WxxxFrame extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 09.01.2019
      */
     public function parse(string $rawContent)
     {
         parent::parse($rawContent);
 
-        $encoding = Helpers::getEncoding2($rawContent{0});
+        $encoding = $this->tagParser->getEncoding($rawContent{0});
         $content  = substr($rawContent, 1);
         $strings  = Helpers::splitString($encoding['delimiter'], $content, 2);
 

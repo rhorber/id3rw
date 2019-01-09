@@ -2,9 +2,11 @@
 
 > PHP-Library for reading and writing ID3 tags.
 
-> ⚠ The Library yet only supports Version 2.4.0.
+> ⚠ The Library yet only supports parsing of Version 2.3.0 and Version 2.4.0, and writing Version 2.4.0.
 
 > ℹ The library is in early development stage, but if possible the current API (public methods) will not change.
+
+This project adheres to [Semantic Versioning](https://semver.org/).
 
 
 ## Example

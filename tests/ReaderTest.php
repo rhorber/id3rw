@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests
  * @author  Raphael Horber
- * @version 06.01.2019
+ * @version 09.01.2019
  */
 namespace Rhorber\ID3rw\Tests;
 
@@ -51,6 +51,22 @@ class ReaderTest extends TestCase
 
         // Act.
         new Reader(__DIR__."/files/unknownFlags.mp3");
+    }
+
+    public function testVersion3(){
+        // Act.
+        $reader = new Reader(__DIR__."/files/version3.mp3");
+
+        // Assert.
+        self::assertSame(3, $reader->getVersion());
+    }
+
+    public function testVersion4(){
+        // Act.
+        $reader = new Reader(__DIR__."/files/version4.mp3");
+
+        // Assert.
+        self::assertSame(4, $reader->getVersion());
     }
 
     public function testUfidFrame()

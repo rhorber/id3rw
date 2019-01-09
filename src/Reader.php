@@ -5,15 +5,16 @@
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 06.01.2019
+ * @version 09.01.2019
  */
 namespace Rhorber\ID3rw;
 
 use Rhorber\ID3rw\FrameParser\FrameParserFactory;
+use Rhorber\ID3rw\TagParser\TagParserInterface;
 
 
 /**
- * Class for reading the ID3 tag (and its frames) of a file (currently only v2.4.0).
+ * Class for reading the ID3 tag (and its frames) of a file (currently only v2.3.0 and v2.4.0).
  *
  * - {@link __construct}: Opens the passed file and reads the tag (with its frames).
  * - {@link getFrames}: Returns the parsed frames.
@@ -23,7 +24,7 @@ use Rhorber\ID3rw\FrameParser\FrameParserFactory;
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 06.01.2019
+ * @version 09.01.2019
  */
 class Reader
 {
@@ -36,12 +37,12 @@ class Reader
     private $_fileHandle = null;
 
     /**
-     * Major version of the source file (4).
+     * Tag parser instance (for the source file's major version).
      *
      * @access private
-     * @var    integer
+     * @var    TagParserInterface
      */
-    private $_version = 0;
+    private $_tagParser = null;
 
     /**
      * Total size of the tag (excluding header, including padding).
@@ -85,19 +86,21 @@ class Reader
         $this->_parseHeader();
         $this->_parseFrames();
 
-        // TODO: Extract to method
-        foreach (["WCOM", "WOAR"] as $identifier) {
-            if (isset($this->_frames[$identifier]) === true && count($this->_frames[$identifier]['content']) === 1) {
-                $content = $this->_frames[$identifier]['content'][0];
-                $raw     = $this->_frames[$identifier]['raw'][0];
-
-                $this->_frames[$identifier]['content'] = $content;
-                $this->_frames[$identifier]['raw']     = $raw;
-            }
-        }
-
         fclose($this->_fileHandle);
         mb_internal_encoding($internalEncoding);
+    }
+
+    /**
+     * Returns the major version of the source file (3 or 4).
+     *
+     * @return  integer
+     * @access  public
+     * @author  Raphael Horber
+     * @version 09.01.2019
+     */
+    public function getVersion(): int
+    {
+        return $this->_tagParser->getMajorVersion();
     }
 
     /**
@@ -144,7 +147,7 @@ class Reader
      * @throws  \UnexpectedValueException If the tag does contain unsupported features (wrong version, flags).
      * @access  private
      * @author  Raphael Horber
-     * @version 24.12.2018
+     * @version 09.01.2019
      */
     private function _parseHeader()
     {
@@ -162,11 +165,10 @@ class Reader
             throw new \UnexpectedValueException("File does not contain ID3 header!");
         }
 
-        // TODO: Support/Implement Version 2.3.0.
         if ($version === "\x04\x00") {
-            $this->_version = 4;
-//        } elseif ($version === "\x03\x00") {
-//            $this->version = 3;
+            $this->_tagParser = new TagParser\Version4();
+        } elseif ($version === "\x03\x00") {
+            $this->_tagParser = new TagParser\Version3();
         } else {
             throw new \UnexpectedValueException("Unsupported version, got: ".bin2hex($version));
         }
@@ -192,43 +194,36 @@ class Reader
      * @throws  \UnexpectedValueException If the tag does contain unsupported features (flags, encoding, BOM).
      * @access  private
      * @author  Raphael Horber
-     * @version 06.01.2019
+     * @version 09.01.2019
      */
     private function _parseFrames()
     {
-        $frames = fread($this->_fileHandle, $this->_tagSize);
+        $framesString       = fread($this->_fileHandle, $this->_tagSize);
+        $frameParserFactory = new FrameParserFactory($this->_tagParser);
 
-        $stringToParse = $frames;
-        while (strlen($stringToParse) > 0) {
-            $header = substr($stringToParse, 0, 10);
+        while (strlen($framesString) > 0) {
+            $header = substr($framesString, 0, 10);
 
             if ($header{0} === "\x00") {
                 // Padding reached: End loop.
-                $stringToParse = "";
+                $framesString = "";
                 continue;
             }
 
-            $identifier = substr($header, 0, 4);
+            $frameId    = substr($header, 0, 4);
             $frameSize  = substr($header, 4, 4);
             $frameFlags = substr($header, 8, 2);
 
             if ($frameFlags !== "\x00\x00") {
-                throw new \UnexpectedValueException("Unsupported frame flags, got: ".bin2hex($frameFlags)." - ".$identifier);
+                throw new \UnexpectedValueException("Unsupported frame flags, got: ".bin2hex($frameFlags)." - ".$frameId);
             }
 
-            if ($this->_version === 4) {
-                $frameSize = Helpers::removeSynchSafeBits($frameSize);
-            } else {
-                $frameSize = hexdec(bin2hex($frameSize));
-            }
-
-            $rawContent = substr($stringToParse, 10, $frameSize);
-            $encoding   = null;
-            $contentKey = null;
+            $parsedSize = $this->_tagParser->getFrameSize($frameSize);
+            $rawContent = substr($framesString, 10, $parsedSize);
 
             // TODO: Improve/Add parsing of other frames than "text".
 
-            $parser = FrameParserFactory::createParser($identifier);
+            $parser = $frameParserFactory->createParser($frameId);
             $parser->parse($rawContent);
 
             $arrayKey   = $parser->getArrayKey();
@@ -237,8 +232,8 @@ class Reader
             $this->_frames[$arrayKey] = $frameArray;
 
             // Frame header + frame size.
-            $totalFrameSize = 10 + $frameSize;
-            $stringToParse  = substr($stringToParse, $totalFrameSize);
+            $totalFrameSize = 10 + $parsedSize;
+            $framesString   = substr($framesString, $totalFrameSize);
         }
     }
 }
