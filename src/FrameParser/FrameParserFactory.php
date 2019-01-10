@@ -66,7 +66,6 @@ class FrameParserFactory
             "APIC",
             "PCNT",
             "POPM",
-            // TODO: Version 2.3.0.
             "USER",
             "PRIV",
         ];

@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 10.01.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
@@ -15,7 +15,7 @@ namespace Rhorber\ID3rw\FrameParser;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 10.01.2019
  */
 class UserFrame extends BaseFrameParser
 {
@@ -70,14 +70,23 @@ class UserFrame extends BaseFrameParser
     /**
      * Returns the unique/array key of this frame for storing in the array (handles frame's multiplicity).
      *
+     * Version 2.4.0:
+     * There may be more than one 'Terms of use' frame in a tag, but only one with the same 'Language'.
+     * Version 2.3.0:
+     * There may only be one "USER" frame in a tag.
+     *
      * @return  string Frame's unique/array key.
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 10.01.2019
      */
     public function getArrayKey(): string
     {
-        return $this->frameId."-".$this->language;
+        if ($this->tagParser->getMajorVersion() === 4) {
+            return $this->frameId."-".$this->language;
+        } elseif ($this->tagParser->getMajorVersion() === 3) {
+            return $this->frameId;
+        }
     }
 }
 
