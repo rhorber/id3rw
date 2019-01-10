@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 10.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -26,7 +26,10 @@ class PcntFrameTest extends TestCase
     /** @var string */
     private static $_frameId = "PCNT";
 
-    /** @dataProvider tagParserDataProvider */
+    /**
+     * @covers ::parse
+     * @dataProvider tagParserDataProvider
+     */
     public function testMinLength(TagParserInterface $tagParser)
     {
         // Arrange.
@@ -46,7 +49,10 @@ class PcntFrameTest extends TestCase
         $this->assertResult($parser, $array);
     }
 
-    /** @dataProvider tagParserDataProvider */
+    /**
+     * @covers ::parse
+     * @dataProvider tagParserDataProvider
+     */
     public function testAdditionalByte(TagParserInterface $tagParser)
     {
         // Arrange.

@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 10.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -35,6 +35,7 @@ class SignFrameTest extends TestCase
         self::$_tagParser = $GLOBALS['TAG_PARSER_VERSION_4'];
     }
 
+    /** @covers ::parse */
     public function testMultiple()
     {
         // Arrange.

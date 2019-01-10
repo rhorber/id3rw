@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 10.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -37,6 +37,7 @@ class FrameParserFactoryTest extends TestCase
 
 
     // region Version 2.3.0
+    /** @covers ::parse */
     public function testUfidFrameVersion3()
     {
         // Act.
@@ -46,6 +47,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UfidFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testTit1FrameVersion3()
     {
         // Act.
@@ -55,6 +57,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testTit2FrameVersion3()
     {
         // Act.
@@ -64,6 +67,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testTalbFrameVersion3()
     {
         // Act.
@@ -73,6 +77,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testTxxxFrameVersion3()
     {
         // Act.
@@ -82,6 +87,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TxxxFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testWcomFrameVersion3()
     {
         // Act.
@@ -91,6 +97,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UrlLinkFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testWcopFrameVersion3()
     {
         // Act.
@@ -100,6 +107,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UrlLinkFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testWxxxFrameVersion3()
     {
         // Act.
@@ -109,6 +117,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\WxxxFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testMcdiFrameVersion3()
     {
         // Act.
@@ -118,6 +127,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\BaseFrameParser::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testEtcoFrameVersion3()
     {
         // Act.
@@ -127,6 +137,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\EtcoFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testUsltFrameVersion3()
     {
         // Act.
@@ -136,6 +147,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UsltFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testCommFrameVersion3()
     {
         // Act.
@@ -145,6 +157,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\CommFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testApicFrameVersion3()
     {
         // Act.
@@ -154,6 +167,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\ApicFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testPcntFrameVersion3()
     {
         // Act.
@@ -163,6 +177,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PcntFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testPopmFrameVersion3()
     {
         // Act.
@@ -172,6 +187,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PopmFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testUserFrameVersion3()
     {
         // Act.
@@ -181,6 +197,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UserFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testPrivFrameVersion3()
     {
         // Act.
@@ -190,7 +207,11 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PrivFrame::class, $parser);
     }
 
-    /** Verifies that "SIGN" in Version 2.3.0 does not produce a specific parser. */
+    /**
+     * Verifies that "SIGN" in Version 2.3.0 does not produce a specific parser.
+     *
+     * @covers ::parse
+     */
     public function testSignFrameVersion3()
     {
         // Act.
@@ -204,6 +225,7 @@ class FrameParserFactoryTest extends TestCase
 
 
     // region Version 2.4.0
+    /** @covers ::parse */
     public function testUfidFrameVersion4()
     {
         // Act.
@@ -213,6 +235,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UfidFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testTit1FrameVersion4()
     {
         // Act.
@@ -222,6 +245,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testTit2FrameVersion4()
     {
         // Act.
@@ -231,6 +255,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testTalbFrameVersion4()
     {
         // Act.
@@ -240,6 +265,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TextInformationFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testTxxxFrameVersion4()
     {
         // Act.
@@ -249,6 +275,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\TxxxFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testWcomFrameVersion4()
     {
         // Act.
@@ -258,6 +285,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UrlLinkFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testWcopFrameVersion4()
     {
         // Act.
@@ -267,6 +295,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UrlLinkFrames::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testWxxxFrameVersion4()
     {
         // Act.
@@ -276,6 +305,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\WxxxFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testMcdiFrameVersion4()
     {
         // Act.
@@ -285,6 +315,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\BaseFrameParser::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testEtcoFrameVersion4()
     {
         // Act.
@@ -294,6 +325,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\EtcoFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testUsltFrameVersion4()
     {
         // Act.
@@ -303,6 +335,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UsltFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testCommFrameVersion4()
     {
         // Act.
@@ -312,6 +345,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\CommFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testApicFrameVersion4()
     {
         // Act.
@@ -321,6 +355,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\ApicFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testPcntFrameVersion4()
     {
         // Act.
@@ -330,6 +365,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PcntFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testPopmFrameVersion4()
     {
         // Act.
@@ -339,6 +375,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PopmFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testUserFrameVersion4()
     {
         // Act.
@@ -348,6 +385,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\UserFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testPrivFrameVersion4()
     {
         // Act.
@@ -357,6 +395,7 @@ class FrameParserFactoryTest extends TestCase
         self::assertInstanceOf(\Rhorber\ID3rw\FrameParser\PrivFrame::class, $parser);
     }
 
+    /** @covers ::parse */
     public function testSignFrameVersion4()
     {
         // Act.

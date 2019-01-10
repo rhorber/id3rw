@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 10.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -31,6 +31,7 @@ class TextInformationFramesVersion3Test extends TestCase
         self::$_tagParser = $GLOBALS['TAG_PARSER_VERSION_3'];
     }
 
+    /** @covers ::parse */
     public function testIsoOneString()
     {
         // Arrange.
@@ -53,6 +54,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testIsoOneStringTerminated()
     {
         // Arrange.
@@ -75,6 +77,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testIsoMultipleStrings()
     {
         // Arrange.
@@ -100,6 +103,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testIsoMultipleStringsTerminated()
     {
         // Arrange.
@@ -125,6 +129,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testIsoEmptyString()
     {
         // Arrange.
@@ -146,6 +151,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testUtfOneString()
     {
         // Arrange.
@@ -168,6 +174,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testUtfOneStringTerminated()
     {
         // Arrange.
@@ -190,6 +197,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testUtfMultipleStrings()
     {
         // Arrange.
@@ -215,6 +223,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testUtfMultipleStringsTerminated()
     {
         // Arrange.
@@ -240,6 +249,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testUtfEmptyString()
     {
         // Arrange.
@@ -261,6 +271,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testTmclFrameIso()
     {
         // Arrange.
@@ -290,6 +301,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testTmclFrameUtf()
     {
         // Arrange.
@@ -319,6 +331,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testTiplFrameIso()
     {
         // Arrange.
@@ -348,6 +361,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $this->assertResult($parser, $identifier, $array);
     }
 
+    /** @covers ::parse */
     public function testTiplFrameUtf()
     {
         // Arrange.

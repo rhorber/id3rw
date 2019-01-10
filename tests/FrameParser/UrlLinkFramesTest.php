@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 10.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -38,7 +38,10 @@ class UrlLinkFramesTest extends TestCase
         $woar->setValue(0);
     }
 
-    /** @dataProvider tagParserDataProvider */
+    /**
+     * @covers ::parse
+     * @dataProvider tagParserDataProvider
+     */
     public function testValid(TagParserInterface $tagParser)
     {
         // Arrange.
@@ -59,7 +62,10 @@ class UrlLinkFramesTest extends TestCase
         $this->assertResult($parser, $arrayKey, $array);
     }
 
-    /** @dataProvider tagParserDataProvider */
+    /**
+     * @covers ::parse
+     * @dataProvider tagParserDataProvider
+     */
     public function testSuperfluousContent(TagParserInterface $tagParser)
     {
         // Arrange.
@@ -80,7 +86,10 @@ class UrlLinkFramesTest extends TestCase
         $this->assertResult($parser, $arrayKey, $array);
     }
 
-    /** @dataProvider tagParserDataProvider */
+    /**
+     * @covers ::parse
+     * @dataProvider tagParserDataProvider
+     */
     public function testMultipleWcom(TagParserInterface $tagParser)
     {
         // Arrange.
@@ -111,7 +120,10 @@ class UrlLinkFramesTest extends TestCase
         $this->assertResult($parser2, $arrayKey2, $array2);
     }
 
-    /** @dataProvider tagParserDataProvider */
+    /**
+     * @covers ::parse
+     * @dataProvider tagParserDataProvider
+     */
     public function testMultipleWoar(TagParserInterface $tagParser)
     {
         // Arrange.

@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 10.01.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -26,7 +26,10 @@ class WxxxFrameTest extends TestCase
     /** @var string */
     private static $_frameId = "WXXX";
 
-    /** @dataProvider tagParserDataProvider */
+    /**
+     * @covers ::parse
+     * @dataProvider tagParserDataProvider
+     */
     public function testIso(TagParserInterface $tagParser)
     {
         // Arrange.
@@ -51,7 +54,10 @@ class WxxxFrameTest extends TestCase
         $this->assertResult($parser, $arrayKey, $array);
     }
 
-    /** @dataProvider tagParserDataProvider */
+    /**
+     * @covers ::parse
+     * @dataProvider tagParserDataProvider
+     */
     public function testUtf(TagParserInterface $tagParser)
     {
         // Arrange.
