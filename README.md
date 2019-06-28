@@ -43,11 +43,23 @@ Features I will add:
 * Improve readme.
 
 - Add names and/or descriptions to the frames.
-- Add the lists of frames (TCON, TFLT, TMED (TKEY))
+- Add the lists of frames (TCON, TFLT, TMED (TKEY), ETCO, APIC)
 - Add notices when displaying TCOP and TPRO
+
+=> rename index `content`, maybe to `parsed` (and move optional `encoding` into it).
 
 ## About/History
 
 I needed a library for modifying some ID3 tags.
 I did not find any library for doing that (getid3 was not able to write correctly),
 so I started writing my own in plain PHP. 
+
+## Version 2.3.0
+
+The following frames can be parsed the same way is in version 2.4.0
+- ETCO
+- MCDI
+- TXXX
+- UFID
+- URL link frames (W000 - WZZZ)
+- WXXX

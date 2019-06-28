@@ -5,13 +5,15 @@
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 21.10.2018
+ * @version 28.06.2019
  */
 namespace Rhorber\ID3rw;
 
+use Rhorber\ID3rw\TagWriter\TagWriterInterface;
+
 
 /**
- * Class for writing an ID3 tag (and its frames) to a file (currently only v2.4.0).
+ * Class for writing an ID3 tag (and its frames) to a file (currently only v2.3.0 and v2.4.0).
  *
  * - {@link __construct}: Initialises the writer (opens target file handle).
  * - {@link writeNewFile}: Writes a new file with the passed frames as ID3 tag.
@@ -24,22 +26,17 @@ namespace Rhorber\ID3rw;
  *
  * @package Rhorber\ID3rw
  * @author  Raphael Horber
- * @version 21.10.2018
+ * @version 28.06.2019
  */
 class Writer
 {
-    /** Supported Major versions. */
-    const SUPPORTED_VERSIONS = [4];
-    /** Supported text encodings. */
-    const SUPPORTED_TEXT_ENCODINGS = ["ISO-8859-1", "UTF-16LE", "UTF-16BE", "UTF-8"];
-
     /**
-     * Major version of the target file (4).
+     * Tag writer instance (for the target file's major version).
      *
      * @access private
-     * @var    integer
+     * @var    TagWriterInterface
      */
-    private $_version;
+    private $_tagWriter = null;
 
     /**
      * Handle of the target file.
@@ -93,15 +90,18 @@ class Writer
      * @throws  \UnexpectedValueException If an unsupported major version is requested.
      * @access  public
      * @author  Raphael Horber
-     * @version 21.10.2018
+     * @version 28.06.2019
      */
     public function __construct(int $version = 4, int $minTotalTagSize = null)
     {
-        if (in_array($version, self::SUPPORTED_VERSIONS) === false) {
+        if ($version === 4) {
+            $this->_tagWriter = new TagWriter\Version4();
+        } elseif ($version === 3) {
+            $this->_tagWriter = new TagWriter\Version3();
+        } else {
             throw new \UnexpectedValueException("Unsupported version, got: ".$version);
         }
 
-        $this->_version         = $version;
         $this->_minTotalTagSize = $minTotalTagSize;
     }
 
@@ -158,7 +158,7 @@ class Writer
      * @throws  \UnexpectedValueException If a frame requests an unsupported encoding.
      * @access  private
      * @author  Raphael Horber
-     * @version 21.10.2018
+     * @version 28.06.2019
      */
     private function _parseFrames(array $frames)
     {
@@ -182,7 +182,7 @@ class Writer
                 if (isset($frame['encoding']) === false || $frame['encoding'] === null) {
                     $frame['encoding'] = "UTF-16LE";
                     $frame['content']  = mb_convert_encoding($frame['content'], "UTF-16LE");
-                } elseif (in_array($frame['encoding'], self::SUPPORTED_TEXT_ENCODINGS) === false) {
+                } elseif (in_array($frame['encoding'], $this->_tagWriter->getSupportedTextEncodings()) === false) {
                     throw new \UnexpectedValueException("Invalid text encoding, got: ".$frame['encoding']);
                 }
             } else {
@@ -262,20 +262,15 @@ class Writer
      * @return  void
      * @access  private
      * @author  Raphael Horber
-     * @version 21.10.2018
+     * @version 28.06.2019
      */
     private function _writeHeader()
     {
         // Identifier.
         fwrite($this->_targetHandle, "ID3");
 
-        // TODO: Support/Implement Version 2.3.0.
         // Version.
-        if ($this->_version === 4) {
-            fwrite($this->_targetHandle, "\x04\x00");
-//        } elseif ($this->version === 3) {
-//            fwrite($this->targetHandle, "\x03\x00");
-        }
+        fwrite($this->_targetHandle, $this->_tagWriter->getVersion());
 
         // Flags.
         fwrite($this->_targetHandle, "\x00");
@@ -292,7 +287,7 @@ class Writer
      * @throws  \UnexpectedValueException If a frame requests an unsupported encoding.
      * @access  private
      * @author  Raphael Horber
-     * @version 21.10.2018
+     * @version 28.06.2019
      */
     private function _writeFrames()
     {
@@ -301,51 +296,17 @@ class Writer
             fwrite($this->_targetHandle, $identifier);
 
             // Size.
-            // TODO: Support/Implement Version 2.3.0.
-            if ($this->_version === 4) {
-                $sizeSynchSafe = Helpers::addSynchSafeBits($frame['size']);
-                fwrite($this->_targetHandle, $sizeSynchSafe);
-//            } elseif ($this->version === 3) {
-//                $hexSize = base_convert($frame['size'], 10, 16);
-//                $padded  = sprintf("%08s", $hexSize);
-//                fwrite($this->targetHandle, hex2bin($padded));
-            }
+            fwrite($this->_targetHandle, $this->_tagWriter->getFrameSize($frame['size']));
 
             // Flags.
             fwrite($this->_targetHandle, "\x00\x00");
 
             // Content.
             if ($identifier{0} === "T") {
-                $encoding = $frame['encoding'];
+                $encoding = $this->_tagWriter->getEncoding($frame['encoding']);
 
-                switch ($encoding) {
-                    case "ISO-8859-1":
-                        $code = "\x00";
-                        $bom  = "";
-//                        $delimiter = "\x00";
-                        break;
-
-                    case "UTF-16LE":
-                        $code = "\x01";
-                        $bom  = "\xff\xfe";
-//                        $delimiter = "\x00\x00";
-                        break;
-
-                    case "UTF-16BE":
-                        $code = "\x01";
-                        $bom  = "\xfe\xff";
-//                        $delimiter = "\x00\x00";
-                        break;
-
-                    case "UTF-8":
-                        $code = "\x03";
-                        $bom  = "";
-//                        $delimiter = "\x00";
-                        break;
-
-                    default:
-                        throw new \UnexpectedValueException("Invalid text encoding, got: ".$encoding);
-                }
+                $code = $encoding['code'];
+                $bom  = $encoding['bom'];
 
                 // TODO: Support multiple strings per frame (v2.4.0).
                 $content = $frame['content'];
