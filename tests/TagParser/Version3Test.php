@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\TagParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 28.06.2019
  */
 namespace Rhorber\ID3rw\Tests\TagParser;
 
@@ -48,7 +48,7 @@ class Version3Test extends TestCase
     }
 
     /** @covers ::getEncoding */
-    public function testGetEncoding2Code0()
+    public function testGetEncodingCode0()
     {
         // Act.
         $actual = self::$_parser->getEncoding("\x00");
@@ -62,7 +62,7 @@ class Version3Test extends TestCase
     }
 
     /** @covers ::getEncoding */
-    public function testGetEncoding2Code1()
+    public function testGetEncodingCode1()
     {
         // Act.
         $actual = self::$_parser->getEncoding("\x01");
@@ -76,7 +76,7 @@ class Version3Test extends TestCase
     }
 
     /** @covers ::getEncoding */
-    public function testGetEncoding2Code2()
+    public function testGetEncodingCode2()
     {
         // Assert.
         self::expectException("UnexpectedValueException");
@@ -87,7 +87,7 @@ class Version3Test extends TestCase
     }
 
     /** @covers ::getEncoding */
-    public function testGetEncoding2Code3()
+    public function testGetEncodingCode3()
     {
         // Assert.
         self::expectException("UnexpectedValueException");
@@ -98,7 +98,7 @@ class Version3Test extends TestCase
     }
 
     /** @covers ::getEncoding */
-    public function testGetEncoding2InvalidCode()
+    public function testGetEncodingInvalidCode()
     {
         // Assert.
         self::expectException("UnexpectedValueException");
