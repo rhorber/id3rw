@@ -43,10 +43,10 @@ class EtcoFrameTest extends TestCase
         $array = [
             'frameId'    => self::$_frameId,
             'rawContent' => $rawContent,
-            'format'     => "02",
+            'format'     => "\x02",
             'codes'      => [
-                '01' => 32,
-                '03' => 431,
+                "\x01" => 32,
+                "\x03" => 431,
             ],
         ];
 
@@ -70,10 +70,10 @@ class EtcoFrameTest extends TestCase
         $array = [
             'frameId'    => self::$_frameId,
             'rawContent' => $rawContent,
-            'format'     => "02",
+            'format'     => "\x02",
             'codes'      => [
-                '01' => 32,
-                '03' => 431,
+                "\x01" => 32,
+                "\x03" => 431,
             ],
         ];
 

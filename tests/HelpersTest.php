@@ -40,6 +40,72 @@ class HelpersTest extends TestCase
         self::assertSame("\x00\x1A\x46\x76", $actual);
     }
 
+    /** @covers ::dec2bin */
+    public function testDec2BinEven()
+    {
+        // Act.
+        // Hex value is '8f42'.
+        $actual = Helpers::dec2bin(36674);
+
+        // Assert.
+        self::assertSame("\x8f\x42", $actual);
+    }
+
+    /** @covers ::dec2bin */
+    public function testDec2BinOdd()
+    {
+        // Act.
+        // Hex value is 'f42'.
+        $actual = Helpers::dec2bin(3906);
+
+        // Assert.
+        self::assertSame("\x0f\x42", $actual);
+    }
+
+    /** @covers ::dec2bin */
+    public function testDec2BinEvenWithMinLength()
+    {
+        // Act.
+        // Hex value is '8f42'.
+        $actual = Helpers::dec2bin(36674, 8);
+
+        // Assert.
+        self::assertSame("\x00\x00\x8f\x42", $actual);
+    }
+
+    /** @covers ::dec2bin */
+    public function testDec2BinOddWithMinLength()
+    {
+        // Act.
+        // Hex value is 'f42'.
+        $actual = Helpers::dec2bin(3906, 8);
+
+        // Assert.
+        self::assertSame("\x00\x00\x0f\x42", $actual);
+    }
+
+    /** @covers ::dec2bin */
+    public function testDec2BinEvenLongerThanMinLength()
+    {
+        // Act.
+        // Hex value is '8f42'.
+        $actual = Helpers::dec2bin(36674, 2);
+
+        // Assert.
+        self::assertSame("\x8f\x42", $actual);
+    }
+
+    /** @covers ::dec2bin */
+    public function testDec2BinOddLongerThanMinLength()
+    {
+        // Act.
+        // Hex value is 'f42'.
+        $actual = Helpers::dec2bin(3906, 2);
+
+        // Assert.
+        self::assertSame("\x0f\x42", $actual);
+    }
+
     /** @covers ::splitString */
     public function testSplitString()
     {

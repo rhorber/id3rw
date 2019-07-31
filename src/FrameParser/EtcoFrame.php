@@ -65,13 +65,13 @@ class EtcoFrame extends BaseFrameParser
         $parsed = [];
 
         foreach ($codes as $code) {
-            $type      = bin2hex($code{0});
+            $type      = $code{0};
             $timestamp = hexdec(bin2hex(substr($code, 1)));
 
             $parsed[$type] = $timestamp;
         }
 
-        $this->format = bin2hex($format);
+        $this->format = $format;
         $this->codes  = $parsed;
     }
 }

@@ -67,6 +67,32 @@ class Helpers
     }
 
     /**
+     * Returns the binary representation of the number's hexadecimal representation.
+     *
+     * The number is converted into its hexadecimal representation.
+     * This is then encoded into its binary form. If necessary a zero will be padded to the hex string.
+     *
+     * @param integer $number Number to process.
+     * @param integer|null $minimalLength Minimal length of the hexadecimal string, null for no minimum.
+     *
+     * @return  string Binary string from number as hex.
+     * @access  public
+     * @author  Raphael Horber
+     * @version 31.07.2019
+     */
+    public static function dec2bin(int $number, int $minimalLength = null): string
+    {
+        $data = dechex($number);
+
+        if ($minimalLength !== null) {
+            $data = sprintf("%0".$minimalLength."s", $data);
+        }
+        $padding = (strlen($data) % 2 === 1) ? "0" : "";
+
+        return hex2bin($padding.$data);
+    }
+
+    /**
      * Splits the string by the delimiter.
      *
      * @param string $delimiter The delimiter.
