@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 31.07.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -30,7 +30,7 @@ class PopmFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testMinLength(TagParserInterface $tagParser)
+    public function testParseMinLength(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "rhorber@example.com\x00\x80\x00\x00\x01\x42";
@@ -55,7 +55,7 @@ class PopmFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testAdditionalByte(TagParserInterface $tagParser)
+    public function testParseAdditionalByte(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "rhorber@example.com\x00\x80\x01\x00\x00\x01\x42";
@@ -80,7 +80,7 @@ class PopmFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testCounterOmitted(TagParserInterface $tagParser)
+    public function testParseCounterOmitted(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "rhorber@example.com\x00\x80";
@@ -99,6 +99,67 @@ class PopmFrameTest extends TestCase
         ];
 
         $this->assertResult($parser, $array);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildMinLength(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $email  = "rhorber@example.com";
+        $parser = new PopmFrame($tagParser, self::$_frameId);
+
+        $parser->email   = $email;
+        $parser->rating  = 128;
+        $parser->counter = 322;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = $email."\x00\x80\x00\x00\x01\x42";
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildAdditionalByte(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $email  = "rhorber@example.com";
+        $parser = new PopmFrame($tagParser, self::$_frameId);
+
+        $parser->email   = $email;
+        $parser->rating  = 128;
+        $parser->counter = 4294967618;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = $email."\x00\x80\x01\x00\x00\x01\x42";
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildValuesOmitted(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $parser = new PopmFrame($tagParser, self::$_frameId);
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00\x00\x00\x00\x00\x00";
+        self::assertSame($rawContent, $content);
     }
 
     /** Returns parsers of the different versions. */

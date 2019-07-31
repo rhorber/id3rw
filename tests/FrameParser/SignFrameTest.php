@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 31.07.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -66,6 +66,37 @@ class SignFrameTest extends TestCase
 
         $this->assertResult($parser1, $arrayKey1, $array1);
         $this->assertResult($parser2, $arrayKey2, $array2);
+    }
+
+    /** @covers ::build */
+    public function testBuildValid()
+    {
+        // Arrange.
+        $parser = new SignFrame(self::$_tagParser, self::$_frameId);
+
+        $parser->groupSymbol = "\x42";
+        $parser->signature   = "\x00\xff\xfe\x32\x00\x34\x00";
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x42\x00\xff\xfe\x32\x00\x34\x00";
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildValuesOmitted()
+    {
+        // Arrange.
+        $parser = new SignFrame(self::$_tagParser, self::$_frameId);
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "";
+        self::assertSame($rawContent, $content);
     }
 
 

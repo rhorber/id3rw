@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 31.07.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -32,9 +32,9 @@ class PrivFrameTest extends TestCase
 
         $class = new \ReflectionClass("\\Rhorber\\ID3rw\\FrameParser\\PrivFrame");
 
-        $wcom = $class->getProperty("_counter");
-        $wcom->setAccessible(true);
-        $wcom->setValue(0);
+        $priv = $class->getProperty("_counter");
+        $priv->setAccessible(true);
+        $priv->setValue(0);
     }
 
     /**
@@ -71,6 +71,44 @@ class PrivFrameTest extends TestCase
 
         $this->assertResult($parser1, $arrayKey1, $array1);
         $this->assertResult($parser2, $arrayKey2, $array2);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildValid(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $owner  = "rhorber@example.com";
+        $parser = new PrivFrame($tagParser, self::$_frameId);
+
+        $parser->owner       = $owner;
+        $parser->privateData = "\xff\xfe\x32\x00\x34\x00";
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = $owner."\x00\xff\xfe\x32\x00\x34\x00";
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildValuesOmitted(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $parser = new PrivFrame($tagParser, self::$_frameId);
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00";
+        self::assertSame($rawContent, $content);
     }
 
     /** Returns parsers of the different versions. */

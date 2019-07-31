@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 31.07.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
@@ -19,7 +19,7 @@ use Rhorber\ID3rw\Helpers;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 31.07.2019
  */
 class UrlLinkFrames extends BaseFrameParser
 {
@@ -97,6 +97,19 @@ class UrlLinkFrames extends BaseFrameParser
     public function getArrayKey(): string
     {
         return $this->_arrayKey;
+    }
+
+    /**
+     * Builds and returns the binary string of the frame, for writing into a file.
+     *
+     * @return  string Frame's content (binary string).
+     * @access  public
+     * @author  Raphael Horber
+     * @version 31.07.2019
+     */
+    public function build(): string
+    {
+        return $this->url;
     }
 }
 

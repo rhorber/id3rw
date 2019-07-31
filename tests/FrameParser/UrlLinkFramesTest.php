@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 31.07.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -42,7 +42,7 @@ class UrlLinkFramesTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testValid(TagParserInterface $tagParser)
+    public function testParseValid(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "http://www.example.com/no-extra-text.html";
@@ -66,7 +66,7 @@ class UrlLinkFramesTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testSuperfluousContent(TagParserInterface $tagParser)
+    public function testParseSuperfluousContent(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "http://www.example.com/with-extra-text.html\x00Content that should be ignored.\x00";
@@ -90,7 +90,7 @@ class UrlLinkFramesTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testMultipleWcom(TagParserInterface $tagParser)
+    public function testParseMultipleWcom(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent1 = "http://www.example.com/first.html";
@@ -124,7 +124,7 @@ class UrlLinkFramesTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testMultipleWoar(TagParserInterface $tagParser)
+    public function testParseMultipleWoar(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent1 = "http://www.example.com/first.html";
@@ -152,6 +152,26 @@ class UrlLinkFramesTest extends TestCase
 
         $this->assertResult($parser1, $arrayKey1, $array1);
         $this->assertResult($parser2, $arrayKey2, $array2);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildWcop(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $url = "http://www.example.com/no-extra-text.html";
+
+        $parser = new UrlLinkFrames($tagParser, "WCOP");
+
+        $parser->url = $url;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        self::assertSame($url, $content);
     }
 
     /** Returns parsers of the different versions. */

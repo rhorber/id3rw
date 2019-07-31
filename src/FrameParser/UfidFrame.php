@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 31.07.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
@@ -76,6 +76,23 @@ class UfidFrame extends BaseFrameParser
     public function getArrayKey(): string
     {
         return $this->frameId."-".$this->owner;
+    }
+
+    /**
+     * Builds and returns the binary string of the frame, for writing into a file.
+     *
+     * @return  string Frame's content (binary string).
+     * @access  public
+     * @author  Raphael Horber
+     * @version 31.07.2019
+     */
+    public function build(): string
+    {
+        if ($this->owner === "") {
+            throw new \InvalidArgumentException("UFID frame: Owner MUST NOT be empty.");
+        }
+
+        return $this->owner."\x00".$this->identifier;
     }
 }
 

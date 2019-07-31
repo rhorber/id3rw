@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 31.07.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -30,7 +30,7 @@ class PcntFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testMinLength(TagParserInterface $tagParser)
+    public function testParseMinLength(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "\x00\x00\x01\x42";
@@ -53,7 +53,7 @@ class PcntFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testAdditionalByte(TagParserInterface $tagParser)
+    public function testParseAdditionalByte(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "\x01\x00\x00\x00\x00";
@@ -70,6 +70,44 @@ class PcntFrameTest extends TestCase
         ];
 
         $this->assertResult($parser, $array);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildMinLength(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $parser = new PcntFrame($tagParser, self::$_frameId);
+
+        $parser->counter = 322;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00\x00\x01\x42";
+        self::assertSame($content, $rawContent);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildAdditionalByte(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $parser = new PcntFrame($tagParser, self::$_frameId);
+
+        $parser->counter = 4294967296;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01\x00\x00\x00\x00";
+        self::assertSame($content, $rawContent);
     }
 
     /** Returns parsers of the different versions. */

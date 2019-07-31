@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 31.07.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -30,7 +30,7 @@ class UfidFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testValid(TagParserInterface $tagParser)
+    public function testParseValid(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "http://www.id3.org/dummy/ufid.html\x00id-42";
@@ -55,7 +55,7 @@ class UfidFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testEmptyId(TagParserInterface $tagParser)
+    public function testParseEmptyId(TagParserInterface $tagParser)
     {
         // Arrange.
         $rawContent = "http://www.id3.org/dummy/ufid.html";
@@ -80,7 +80,7 @@ class UfidFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testEmptyOwner(TagParserInterface $tagParser)
+    public function testParseEmptyOwner(TagParserInterface $tagParser)
     {
         // Assert.
         self::expectException("InvalidArgumentException");
@@ -92,6 +92,71 @@ class UfidFrameTest extends TestCase
         // Act.
         $parser = new UfidFrame($tagParser, self::$_frameId);
         $parser->parse($rawContent);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildValid(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $owner      = "http://www.id3.org/dummy/ufid.html";
+        $identifier = "id-42";
+
+        $parser = new UfidFrame($tagParser, self::$_frameId);
+
+        $parser->owner      = $owner;
+        $parser->identifier = $identifier;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = $owner."\x00".$identifier;
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildEmptyId(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $owner = "http://www.id3.org/dummy/ufid.html";
+
+        $parser = new UfidFrame($tagParser, self::$_frameId);
+
+        $parser->owner      = $owner;
+        $parser->identifier = "";
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = $owner."\x00";
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildEmptyOwner(TagParserInterface $tagParser)
+    {
+        // Assert.
+        self::expectException("InvalidArgumentException");
+        self::expectExceptionMessage("UFID frame: Owner MUST NOT be empty.");
+
+        // Arrange.
+        $parser = new UfidFrame($tagParser, self::$_frameId);
+
+        $parser->owner      = "";
+        $parser->identifier = "id-42";
+
+        // Act.
+        $parser->build();
     }
 
     /** Returns parsers of the different versions. */
