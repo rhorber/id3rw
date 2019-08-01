@@ -82,7 +82,7 @@ class WxxxFrame extends BaseFrameParser
      */
     public function getArrayKey(): string
     {
-        $encoded = mb_convert_encoding($this->description, mb_internal_encoding(), $this->encoding->getName());
+        $encoded = $this->convertToInternal($this->description, $this->encoding);
 
         return $this->frameId."-".$encoded;
     }

@@ -137,6 +137,22 @@ class BaseFrameParser
     {
         return $this->rawContent;
     }
+
+    /**
+     * Converts the passed string into the internal encoding.
+     *
+     * @param string $string String to convert.
+     * @param EncodingInterface $fromEncoding Encoding in which the string is encoded.
+     *
+     * @return  string The encoded string.
+     * @access  protected
+     * @author  Raphael Horber
+     * @version 01.08.2019
+     */
+    protected function convertToInternal(string $string, EncodingInterface $fromEncoding): string
+    {
+        return mb_convert_encoding($string, mb_internal_encoding(), $fromEncoding->getName());
+    }
 }
 
 
