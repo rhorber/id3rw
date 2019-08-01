@@ -5,11 +5,12 @@
  *
  * @package Rhorber\ID3rw\Tests
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 namespace Rhorber\ID3rw\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Rhorber\ID3rw\Encoding\EncodingFactory;
 use Rhorber\ID3rw\Reader;
 
 
@@ -97,7 +98,7 @@ class ReaderTest extends TestCase
         $arrayKey = "TIT1";
         $array    = [
             'frameId'     => "TIT1",
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => [
                 0 => "\xff\xfe".mb_convert_encoding("UTF-16LE Text 1", "UTF-16LE"),
                 1 => "\xff\xfe".mb_convert_encoding("UTF-16LE Text 2", "UTF-16LE"),
@@ -118,7 +119,7 @@ class ReaderTest extends TestCase
         $arrayKey = "TIT2";
         $array    = [
             'frameId'     => "TIT2",
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => [
                 0 => "\xff\xfe".mb_convert_encoding("UTF-16LE Text 1", "UTF-16LE"),
                 1 => "\xff\xfe".mb_convert_encoding("UTF-16LE Text 2", "UTF-16LE"),
@@ -139,7 +140,7 @@ class ReaderTest extends TestCase
         $arrayKey = "TIT3";
         $array    = [
             'frameId'     => "TIT3",
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe".mb_convert_encoding("UTF-16LE Text", "UTF-16LE"),
         ];
 
@@ -157,7 +158,7 @@ class ReaderTest extends TestCase
         $arrayKey = "TALB";
         $array    = [
             'frameId'     => "TALB",
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe",
         ];
 
@@ -177,7 +178,7 @@ class ReaderTest extends TestCase
         $key2     = "\xff\xfe".mb_convert_encoding("Piano", "UTF-16LE");
         $array    = [
             'frameId'     => "TMCL",
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => [
                 $key1 => "\xff\xfe".mb_convert_encoding("Raphael Horber", "UTF-16LE"),
                 $key2 => "\xff\xfe".mb_convert_encoding("Stefan Horber", "UTF-16LE"),
@@ -198,7 +199,7 @@ class ReaderTest extends TestCase
         $arrayKey = "TXXX-ISO-8859-1";
         $array    = [
             'frameId'     => "TXXX",
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'description' => "ISO-8859-1",
             'value'       => "TXXX frame with ISO encoding.",
         ];
@@ -217,7 +218,7 @@ class ReaderTest extends TestCase
         $arrayKey = "TXXX-UTF-16";
         $array    = [
             'frameId'     => "TXXX",
-            'encoding'    => "UTF-16BE",
+            'encoding'    => EncodingFactory::getUtf16BigEndian(),
             'description' => mb_convert_encoding("UTF-16", "UTF-16BE"),
             'value'       => mb_convert_encoding("TXXX frame with UTF-16BE encoding.", "UTF-16BE"),
         ];
@@ -271,7 +272,7 @@ class ReaderTest extends TestCase
         $arrayKey = "WXXX-ISO";
         $array    = [
             'frameId'     => "WXXX",
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'description' => "ISO",
             'url'         => "http://www.example.com/iso.html",
         ];
@@ -290,7 +291,7 @@ class ReaderTest extends TestCase
         $arrayKey = "WXXX-UTF-16";
         $array    = [
             'frameId'     => "WXXX",
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'description' => "\xff\xfe".mb_convert_encoding("UTF-16", "UTF-16LE"),
             'url'         => "http://www.example.com/utf-16.html",
         ];

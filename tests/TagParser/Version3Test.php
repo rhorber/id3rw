@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\TagParser
  * @author  Raphael Horber
- * @version 28.06.2019
+ * @version 01.08.2019
  */
 namespace Rhorber\ID3rw\Tests\TagParser;
 
@@ -54,11 +54,7 @@ class Version3Test extends TestCase
         $actual = self::$_parser->getEncoding("\x00");
 
         // Assert.
-        $expected = [
-            'encoding'  => "ISO-8859-1",
-            'delimiter' => "\x00",
-        ];
-        self::assertSame($expected, $actual);
+        self::assertInstanceOf("\\Rhorber\\ID3rw\\Encoding\\Iso88591", $actual);
     }
 
     /** @covers ::getEncoding */
@@ -68,11 +64,7 @@ class Version3Test extends TestCase
         $actual = self::$_parser->getEncoding("\x01");
 
         // Assert.
-        $expected = [
-            'encoding'  => "UTF-16",
-            'delimiter' => "\x00\x00",
-        ];
-        self::assertSame($expected, $actual);
+        self::assertInstanceOf("\\Rhorber\\ID3rw\\Encoding\\Utf16", $actual);
     }
 
     /** @covers ::getEncoding */

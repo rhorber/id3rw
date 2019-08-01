@@ -5,10 +5,11 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
+use Rhorber\ID3rw\Encoding\EncodingInterface;
 use Rhorber\ID3rw\Helpers;
 
 
@@ -17,7 +18,7 @@ use Rhorber\ID3rw\Helpers;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 class TextInformationFrames extends BaseFrameParser
 {
@@ -25,9 +26,9 @@ class TextInformationFrames extends BaseFrameParser
      * Frame's "Text encoding" value.
      *
      * @access public
-     * @var    string
+     * @var    EncodingInterface
      */
-    public $encoding = "";
+    public $encoding = null;
 
     /**
      * Frame's "Information".
@@ -46,7 +47,7 @@ class TextInformationFrames extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 09.01.2019
+     * @version 01.08.2019
      */
     public function parse(string $rawContent)
     {
@@ -54,7 +55,7 @@ class TextInformationFrames extends BaseFrameParser
 
         $encoding = $this->tagParser->getEncoding($rawContent{0});
         $content  = substr($rawContent, 1);
-        $strings  = Helpers::splitString($encoding['delimiter'], $content);
+        $strings  = Helpers::splitString($encoding->getDelimiter(), $content);
 
         if ($this->tagParser->getMajorVersion() === 4) {
             $strings = $this->_processStringsVersion4($strings);
@@ -62,7 +63,7 @@ class TextInformationFrames extends BaseFrameParser
             $strings = $strings[0];
         }
 
-        $this->encoding    = $encoding['encoding'];
+        $this->encoding    = $encoding;
         $this->information = $strings;
     }
 

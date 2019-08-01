@@ -5,11 +5,12 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 31.07.2019
- * @todo    Class name is not correct any more (with build).
+ * @version 01.08.2019
+ * @todo    Class name is not accurate any more (with build).
  */
 namespace Rhorber\ID3rw\FrameParser;
 
+use Rhorber\ID3rw\Encoding\EncodingInterface;
 use Rhorber\ID3rw\TagParser\TagParserInterface;
 
 
@@ -18,7 +19,7 @@ use Rhorber\ID3rw\TagParser\TagParserInterface;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 31.07.2019
+ * @version 01.08.2019
  */
 class BaseFrameParser
 {

@@ -5,10 +5,11 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
+use Rhorber\ID3rw\Encoding\EncodingInterface;
 use Rhorber\ID3rw\Helpers;
 
 
@@ -19,7 +20,7 @@ use Rhorber\ID3rw\Helpers;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 class UsltFrame extends BaseFrameParser
 {
@@ -27,9 +28,9 @@ class UsltFrame extends BaseFrameParser
      * Frame's "Text encoding" value.
      *
      * @access public
-     * @var    string
+     * @var    EncodingInterface
      */
-    public $encoding = "";
+    public $encoding = null;
 
     /**
      * Frame's "Language" value.
@@ -64,7 +65,7 @@ class UsltFrame extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 09.01.2019
+     * @version 01.08.2019
      */
     public function parse(string $rawContent)
     {
@@ -73,9 +74,9 @@ class UsltFrame extends BaseFrameParser
         $encoding = $this->tagParser->getEncoding($rawContent{0});
         $language = substr($rawContent, 1, 3);
         $content  = substr($rawContent, 4);
-        $strings  = Helpers::splitString($encoding['delimiter'], $content, 2);
+        $strings  = Helpers::splitString($encoding->getDelimiter(), $content, 2);
 
-        $this->encoding    = $encoding['encoding'];
+        $this->encoding    = $encoding;
         $this->language    = $language;
         $this->description = $strings[0];
         $this->text        = $strings[1];
@@ -87,11 +88,11 @@ class UsltFrame extends BaseFrameParser
      * @return  string Frame's unique/array key.
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 01.08.2019
      */
     public function getArrayKey(): string
     {
-        $encoded = mb_convert_encoding($this->description, mb_internal_encoding(), $this->encoding);
+        $encoded = mb_convert_encoding($this->description, mb_internal_encoding(), $this->encoding->getName());
 
         return $this->frameId."-".$this->language."-".$encoded;
     }

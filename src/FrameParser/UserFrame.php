@@ -5,9 +5,11 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 01.08.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
+
+use Rhorber\ID3rw\Encoding\EncodingInterface;
 
 
 /**
@@ -15,7 +17,7 @@ namespace Rhorber\ID3rw\FrameParser;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 01.08.2019
  */
 class UserFrame extends BaseFrameParser
 {
@@ -23,9 +25,9 @@ class UserFrame extends BaseFrameParser
      * Frame's "Text encoding" value.
      *
      * @access public
-     * @var    string
+     * @var    EncodingInterface
      */
-    public $encoding = "";
+    public $encoding = null;
 
     /**
      * Frame's "Language" value.
@@ -52,7 +54,7 @@ class UserFrame extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 09.01.2019
+     * @version 01.08.2019
      */
     public function parse(string $rawContent)
     {
@@ -62,7 +64,7 @@ class UserFrame extends BaseFrameParser
         $language = substr($rawContent, 1, 3);
         $content  = substr($rawContent, 4);
 
-        $this->encoding = $encoding['encoding'];
+        $this->encoding = $encoding;
         $this->language = $language;
         $this->text     = $content;
     }

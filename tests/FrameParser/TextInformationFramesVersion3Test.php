@@ -5,11 +5,12 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 10.01.2019
+ * @version 01.08.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
 use PHPUnit\Framework\TestCase;
+use Rhorber\ID3rw\Encoding\EncodingFactory;
 use Rhorber\ID3rw\FrameParser\TextInformationFrames;
 use Rhorber\ID3rw\TagParser\TagParserInterface;
 
@@ -47,7 +48,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'information' => $information,
         ];
 
@@ -70,7 +71,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'information' => $information,
         ];
 
@@ -96,7 +97,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'information' => $information[0],
         ];
 
@@ -122,7 +123,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'information' => $information[0],
         ];
 
@@ -144,7 +145,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'information' => "",
         ];
 
@@ -167,7 +168,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe".$information,
         ];
 
@@ -190,7 +191,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe".$information,
         ];
 
@@ -216,7 +217,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe".$information[0],
         ];
 
@@ -242,7 +243,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe".$information[0],
         ];
 
@@ -264,7 +265,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe",
         ];
 
@@ -294,7 +295,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'information' => $information[0],
         ];
 
@@ -324,7 +325,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe".$information[0],
         ];
 
@@ -354,7 +355,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "ISO-8859-1",
+            'encoding'    => EncodingFactory::getIso88591(),
             'information' => $information[0],
         ];
 
@@ -384,7 +385,7 @@ class TextInformationFramesVersion3Test extends TestCase
         $array = [
             'frameId'     => $identifier,
             'rawContent'  => $rawContent,
-            'encoding'    => "UTF-16",
+            'encoding'    => EncodingFactory::getUtf16(),
             'information' => "\xff\xfe".$information[0],
         ];
 

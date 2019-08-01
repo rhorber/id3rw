@@ -5,10 +5,11 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
+use Rhorber\ID3rw\Encoding\EncodingInterface;
 use Rhorber\ID3rw\Helpers;
 
 
@@ -19,7 +20,7 @@ use Rhorber\ID3rw\Helpers;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 class ApicFrame extends BaseFrameParser
 {
@@ -27,9 +28,9 @@ class ApicFrame extends BaseFrameParser
      * Frame's "Text encoding" value.
      *
      * @access public
-     * @var    string
+     * @var    EncodingInterface
      */
-    public $encoding = "";
+    public $encoding = null;
 
     /**
      * Frame's "MIME type" value.
@@ -72,7 +73,7 @@ class ApicFrame extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 09.01.2019
+     * @version 01.08.2019
      */
     public function parse(string $rawContent)
     {
@@ -82,12 +83,12 @@ class ApicFrame extends BaseFrameParser
         $content   = substr($rawContent, 1);
         $typeParts = Helpers::splitString("\x00", $content, 2);
 
-        $this->encoding    = $encoding['encoding'];
+        $this->encoding    = $encoding;
         $this->mimeType    = $typeParts[0];
         $this->pictureType = $typeParts[1]{0};
 
         $string  = substr($typeParts[1], 1);
-        $strings = Helpers::splitString($encoding['delimiter'], $string, 2);
+        $strings = Helpers::splitString($encoding->getDelimiter(), $string, 2);
 
         $this->description = $strings[0];
         $this->pictureData = $strings[1];
@@ -105,11 +106,11 @@ class ApicFrame extends BaseFrameParser
      * @return  string Frame's unique/array key.
      * @access  public
      * @author  Raphael Horber
-     * @version 02.01.2019
+     * @version 01.08.2019
      */
     public function getArrayKey(): string
     {
-        $encoded = mb_convert_encoding($this->description, mb_internal_encoding(), $this->encoding);
+        $encoded = mb_convert_encoding($this->description, mb_internal_encoding(), $this->encoding->getName());
 
         return $this->frameId."-".$encoded;
     }

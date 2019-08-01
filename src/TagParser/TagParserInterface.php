@@ -4,16 +4,18 @@
  * Interface TagParserInterface.
  *
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 namespace Rhorber\ID3rw\TagParser;
+
+use Rhorber\ID3rw\Encoding\EncodingInterface;
 
 
 /**
  * Interface that defines parsing operations which differ between versions.
  *
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 01.08.2019
  */
 interface TagParserInterface
 {
@@ -40,24 +42,17 @@ interface TagParserInterface
     public function getFrameSize(string $frameSize): int;
 
     /**
-     * Determine and return the encoding name according to the encoding code.
-     * <br /><br />
-     * <code>
-     * $resultArray = [
-     *   'encoding'  => "Name of the encoding",
-     *   'delimiter' => "Delimiter specific to encoding (\x00 or \x00\x00)",
-     * ]
-     * </code>
+     * Determine and return the encoding according to the encoding code.
      *
      * @param string $encodingCode Encoding code to process (binary string).
      *
-     * @return  array                     Result array with information about the encoding.
+     * @return  EncodingInterface Determined encoding.
      * @throws  \UnexpectedValueException If the found encoding code is invalid.
      * @access  public
      * @author  Raphael Horber
-     * @version 09.01.2019
+     * @version 01.08.2019
      */
-    public function getEncoding(string $encodingCode): array;
+    public function getEncoding(string $encodingCode): EncodingInterface;
 }
 
 
