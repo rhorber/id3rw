@@ -5,9 +5,11 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 05.08.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
+
+use Rhorber\ID3rw\Helpers;
 
 
 /**
@@ -17,7 +19,7 @@ namespace Rhorber\ID3rw\FrameParser;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 09.01.2019
+ * @version 05.08.2019
  */
 class EtcoFrame extends BaseFrameParser
 {
@@ -73,6 +75,33 @@ class EtcoFrame extends BaseFrameParser
 
         $this->format = $format;
         $this->codes  = $parsed;
+    }
+
+    /**
+     * Builds and returns the binary string of the frame, for writing into a file.
+     *
+     * @return  string Frame's content (binary string).
+     * @throws  \UnexpectedValueException If the time stamp format is invalid.
+     * @access  public
+     * @author  Raphael Horber
+     * @version 05.08.2019
+     */
+    public function build(): string
+    {
+        if ($this->format !== "\x01" && $this->format !== "\x02") {
+            throw new \UnexpectedValueException("Invalid time stamp format, got: ".bin2hex($this->format));
+        }
+
+        $frame = $this->format;
+
+        foreach ($this->codes as $type => $timestamp) {
+            $binary = Helpers::dec2bin($timestamp);
+
+            // TODO: verify type of event, should also be checked at import (generate warning)
+            $frame  .= $type.$binary;
+        }
+
+        return $frame;
     }
 }
 
