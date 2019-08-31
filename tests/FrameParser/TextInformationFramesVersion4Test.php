@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -33,7 +33,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testIsoOneString()
+    public function testParseIsoOneString()
     {
         // Arrange.
         $identifier  = "TIT2";
@@ -56,7 +56,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testIsoOneStringTerminated()
+    public function testParseIsoOneStringTerminated()
     {
         // Arrange.
         $identifier  = "TIT2";
@@ -79,7 +79,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testIsoMultipleStrings()
+    public function testParseIsoMultipleStrings()
     {
         // Arrange.
         $identifier  = "TIT2";
@@ -105,7 +105,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testIsoMultipleStringsTerminated()
+    public function testParseIsoMultipleStringsTerminated()
     {
         // Arrange.
         $identifier  = "TIT2";
@@ -131,7 +131,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testIsoEmptyString()
+    public function testParseIsoEmptyString()
     {
         // Arrange.
         $identifier = "TIT2";
@@ -153,7 +153,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testUtfOneString()
+    public function testParseUtfOneString()
     {
         // Arrange.
         $identifier  = "TIT2";
@@ -176,7 +176,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testUtfOneStringTerminated()
+    public function testParseUtfOneStringTerminated()
     {
         // Arrange.
         $identifier  = "TIT2";
@@ -199,7 +199,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testUtfMultipleStrings()
+    public function testParseUtfMultipleStrings()
     {
         // Arrange.
         $identifier  = "TIT2";
@@ -228,7 +228,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testUtfMultipleStringsTerminated()
+    public function testParseUtfMultipleStringsTerminated()
     {
         // Arrange.
         $identifier  = "TIT2";
@@ -257,7 +257,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testUtfEmptyString()
+    public function testParseUtfEmptyString()
     {
         // Arrange.
         $identifier = "TIT2";
@@ -279,7 +279,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testTmclFrameIso()
+    public function testParseTmclFrameIso()
     {
         // Arrange.
         $identifier  = "TMCL";
@@ -311,7 +311,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testTmclFrameUtf()
+    public function testParseTmclFrameUtf()
     {
         // Arrange.
         $identifier  = "TMCL";
@@ -343,7 +343,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testTiplFrameIso()
+    public function testParseTiplFrameIso()
     {
         // Arrange.
         $identifier  = "TIPL";
@@ -375,7 +375,7 @@ class TextInformationFramesVersion4Test extends TestCase
     }
 
     /** @covers ::parse */
-    public function testTiplFrameUtf()
+    public function testParseTiplFrameUtf()
     {
         // Arrange.
         $identifier  = "TIPL";
@@ -404,6 +404,314 @@ class TextInformationFramesVersion4Test extends TestCase
         ];
 
         $this->assertResult($parser, $identifier, $array);
+    }
+
+    /** @covers ::build */
+    public function testBuildIsoOneString()
+    {
+        // Arrange.
+        $identifier  = "TIT2";
+        $information = "ISO-8859-1 Text";
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getIso88591();
+        $parser->information = $information;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00".$information;
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildIsoMultipleStrings()
+    {
+        // Arrange.
+        $identifier  = "TIT2";
+        $information = [
+            "ISO-8859-1 Text 1",
+            "ISO-8859-1 Text 2",
+        ];
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getIso88591();
+        $parser->information = $information;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00".$information[0]."\x00".$information[1];
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildIsoEmptyString()
+    {
+        // Arrange.
+        $identifier = "TIT2";
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getIso88591();
+        $parser->information = "";
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00";
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildUtfOneString()
+    {
+        // Arrange.
+        $identifier  = "TIT2";
+        $information = "\xff\xfe".mb_convert_encoding("UTF-16LE Text", "UTF-16LE");
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->information = $information;
+
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01".$information;
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildUtfMultipleStrings()
+    {
+        // Arrange.
+        $identifier  = "TIT2";
+        $information = [
+            "\xff\xfe".mb_convert_encoding("UTF-16LE Text 1", "UTF-16LE"),
+            "\xff\xfe".mb_convert_encoding("UTF-16LE Text 2", "UTF-16LE"),
+        ];
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->information = $information;
+
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01".$information[0]."\x00\x00".$information[1];
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildUtfEmptyString()
+    {
+        // Arrange.
+        $identifier = "TIT2";
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->information = "\xff\xfe";
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01\xff\xfe";
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildTmclFrameIso()
+    {
+        // Arrange.
+        $identifier  = "TMCL";
+        $information = [
+            "Saxophone",
+            "Raphael Horber",
+            "Piano",
+            "Stefan Horber",
+        ];
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getIso88591();
+        $parser->information = [
+            $information[0] => $information[1],
+            $information[2] => $information[3],
+        ];
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00".$information[0]."\x00".$information[1];
+        $rawContent .= "\x00".$information[2]."\x00".$information[3];
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildTmclFrameUtf()
+    {
+        // Arrange.
+        $identifier  = "TMCL";
+        $information = [
+            "\xff\xfe".mb_convert_encoding("Saxophone", "UTF-16LE"),
+            "\xff\xfe".mb_convert_encoding("Raphael Horber", "UTF-16LE"),
+            "\xff\xfe".mb_convert_encoding("Piano", "UTF-16LE"),
+            "\xff\xfe".mb_convert_encoding("Stefan Horber", "UTF-16LE"),
+        ];
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->information = [
+            $information[0] => $information[1],
+            $information[2] => $information[3],
+        ];
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01".$information[0]."\x00\x00".$information[1];
+        $rawContent .= "\x00\x00".$information[2]."\x00\x00".$information[3];
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildTiplFrameIso()
+    {
+        // Arrange.
+        $identifier  = "TIPL";
+        $information = [
+            "Writer",
+            "Raphael Horber",
+            "Producer",
+            "Stefan Horber",
+        ];
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getIso88591();
+        $parser->information = [
+            $information[0] => $information[1],
+            $information[2] => $information[3],
+        ];
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00".$information[0]."\x00".$information[1];
+        $rawContent .= "\x00".$information[2]."\x00".$information[3];
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildTiplFrameUtf()
+    {
+        // Arrange.
+        $identifier  = "TIPL";
+        $information = [
+            "\xff\xfe".mb_convert_encoding("Writer", "UTF-16LE"),
+            "\xff\xfe".mb_convert_encoding("Raphael Horber", "UTF-16LE"),
+            "\xff\xfe".mb_convert_encoding("Producer", "UTF-16LE"),
+            "\xff\xfe".mb_convert_encoding("Stefan Horber", "UTF-16LE"),
+        ];
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->information = [
+            $information[0] => $information[1],
+            $information[2] => $information[3],
+        ];
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01".$information[0]."\x00\x00".$information[1];
+        $rawContent .= "\x00\x00".$information[2]."\x00\x00".$information[3];
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildInvalidBomOneString()
+    {
+        // Assert.
+        self::expectException("UnexpectedValueException");
+        self::expectExceptionMessage("Invalid BOM, got: fefe");
+
+        // Arrange.
+        $identifier  = "TIT2";
+        $information = "\xfe\xfe".mb_convert_encoding("Test information with an invalid BOM.", "UTF-16LE");
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->information = $information;
+
+        // Act.
+        $parser->build();
+    }
+
+    /** @covers ::build */
+    public function testBuildInvalidBomFirstString()
+    {
+        // Assert.
+        self::expectException("UnexpectedValueException");
+        self::expectExceptionMessage("Invalid BOM, got: fefe");
+
+        // Arrange.
+        $identifier  = "TIT2";
+        $information = [
+            "\xfe\xfe".mb_convert_encoding("Wrong BOM", "UTF-16LE"),
+            "\xff\xfe".mb_convert_encoding("UTF-16LE Text 1", "UTF-16LE"),
+        ];
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->information = $information;
+
+        // Act.
+        $parser->build();
+    }
+
+    /** @covers ::build */
+    public function testBuildInvalidBomSecondString()
+    {
+        // Assert.
+        self::expectException("UnexpectedValueException");
+        self::expectExceptionMessage("Invalid BOM, got: fefe");
+
+        // Arrange.
+        $identifier  = "TIT2";
+        $information = [
+            "\xff\xfe".mb_convert_encoding("UTF-16LE Text 1", "UTF-16LE"),
+            "\xfe\xfe".mb_convert_encoding("Wrong BOM", "UTF-16LE"),
+        ];
+
+        $parser = new TextInformationFrames(self::$_tagParser, $identifier);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->information = $information;
+
+        // Act.
+        $parser->build();
     }
 
 

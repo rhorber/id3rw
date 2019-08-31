@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
@@ -18,7 +18,7 @@ use Rhorber\ID3rw\Helpers;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 class TextInformationFrames extends BaseFrameParser
 {
@@ -34,7 +34,7 @@ class TextInformationFrames extends BaseFrameParser
      * Frame's "Information".
      *
      * @access public
-     * @var    string
+     * @var    string|string[]
      */
     public $information = "";
 
@@ -47,7 +47,7 @@ class TextInformationFrames extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 01.08.2019
+     * @version 31.08.2019
      */
     public function parse(string $rawContent)
     {
@@ -58,7 +58,7 @@ class TextInformationFrames extends BaseFrameParser
         $strings  = Helpers::splitString($encoding->getDelimiter(), $content);
 
         if ($this->tagParser->getMajorVersion() === 4) {
-            $strings = $this->_processStringsVersion4($strings);
+            $strings = $this->_parseStringsVersion4($strings);
         } elseif ($this->tagParser->getMajorVersion() === 3) {
             $strings = $strings[0];
         }
@@ -68,16 +68,44 @@ class TextInformationFrames extends BaseFrameParser
     }
 
     /**
+     * Builds and returns the binary string of the frame, for writing into a file.
+     *
+     * @return  string Frame's content (binary string).
+     * @access  public
+     * @author  Raphael Horber
+     * @version 31.08.2019
+     */
+    public function build(): string
+    {
+        $information = "";
+
+        if (is_string($this->information) === true) {
+            $this->verifyBom($this->encoding, $this->information);
+            $information = $this->information;
+        } elseif ($this->tagParser->getMajorVersion() === 4) {
+            $information = $this->_buildStringsVersion4($this->information);
+        } elseif ($this->tagParser->getMajorVersion() === 3) {
+            $this->verifyBom($this->encoding, $this->information[0]);
+            $information = $this->information[0];
+        }
+
+        $frame = $this->encoding->getCode();
+        $frame .= $information;
+
+        return $frame;
+    }
+
+    /**
      * Processes the parsed string according to the Version 2.4.0 specification and returns the result.
      *
      * @param string[] $strings Parsed strings to process.
      *
      * @return  string|string[]
-     * @access  public
+     * @access  private
      * @author  Raphael Horber
      * @version 09.01.2019
      */
-    private function _processStringsVersion4(array $strings)
+    private function _parseStringsVersion4(array $strings)
     {
         if (count($strings) === 1) {
             return $strings[0];
@@ -95,6 +123,38 @@ class TextInformationFrames extends BaseFrameParser
         }
 
         return $strings;
+    }
+
+    /**
+     * Builds the information segment according to the Version 2.4.0 specification and returns it.
+     *
+     * @param string[] $strings Information strings to process.
+     * @return  string
+     * @access  private
+     * @author  Raphael Horber
+     * @version 31.08.2019
+     */
+    private function _buildStringsVersion4(array $strings): string
+    {
+        $delimiter = $this->encoding->getDelimiter();
+        $elements  = [];
+
+        if (in_array($this->frameId, ["TMCL", "TIPL"]) === true) {
+            foreach ($strings as $key => $value) {
+                $this->verifyBom($this->encoding, $key);
+                $this->verifyBom($this->encoding, $value);
+
+                $elements[] = $key.$delimiter.$value;
+            }
+        } else {
+            foreach ($strings as $value) {
+                $this->verifyBom($this->encoding, $value);
+
+                $elements[] = $value;
+            }
+        }
+
+        return implode($delimiter, $elements);
     }
 }
 
