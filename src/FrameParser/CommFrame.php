@@ -96,6 +96,28 @@ class CommFrame extends BaseFrameParser
 
         return $this->frameId."-".$this->language."-".$encoded;
     }
+
+    /**
+     * Builds and returns the binary string of the frame, for writing into a file.
+     *
+     * @return  string Frame's content (binary string).
+     * @access  public
+     * @author  Raphael Horber
+     * @version 31.08.2019
+     */
+    public function build(): string
+    {
+        $this->verifyBom($this->encoding, $this->description);
+        $this->verifyBom($this->encoding, $this->text);
+
+        $frame = $this->encoding->getCode();
+        $frame .= $this->language;
+        $frame .= $this->description;
+        $frame .= $this->encoding->getDelimiter();
+        $frame .= $this->text;
+
+        return $frame;
+    }
 }
 
 
