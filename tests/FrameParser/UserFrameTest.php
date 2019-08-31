@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\Tests\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 namespace Rhorber\ID3rw\Tests\FrameParser;
 
@@ -45,9 +45,9 @@ class UserFrameTest extends TestCase
     // endregion
 
 
-    // region Version 2.3.0
+    // region Version 2.3.0, parse
     /** @covers ::parse */
-    public function testIsoVersion3()
+    public function testParseIsoVersion3()
     {
         // Arrange.
         $text       = "Test terms of use with ISO-8859-1 encoding.";
@@ -70,7 +70,7 @@ class UserFrameTest extends TestCase
     }
 
     /** @covers ::parse */
-    public function testUtfVersion3()
+    public function testParseUtfVersion3()
     {
         // Arrange.
         $text       = mb_convert_encoding("Test terms of use with UTF-16LE encoding.", "UTF-16LE");
@@ -94,9 +94,9 @@ class UserFrameTest extends TestCase
     // endregion
 
 
-    // region Version 2.4.0
+    // region Version 2.4.0, parse
     /** @covers ::parse */
-    public function testIsoVersion4()
+    public function testParseIsoVersion4()
     {
         // Arrange.
         $text       = "Test terms of use with ISO-8859-1 encoding.";
@@ -120,7 +120,7 @@ class UserFrameTest extends TestCase
     }
 
     /** @covers ::parse */
-    public function testUtfVersion4()
+    public function testParseUtfVersion4()
     {
         // Arrange.
         $text       = mb_convert_encoding("Test terms of use with UTF-16LE encoding.", "UTF-16LE");
@@ -141,6 +141,88 @@ class UserFrameTest extends TestCase
         ];
 
         $this->assertResult($parser, $arrayKey, $array);
+    }
+    // endregion
+
+
+    // region Version 2.3.0, build
+    /** @covers ::build */
+    public function testBuildIsoVersion3()
+    {
+        // Arrange.
+        $text   = "Test terms of use with ISO-8859-1 encoding.";
+        $parser = new UserFrame(self::$_tagParserVersion3, self::$_frameId);
+
+        $parser->encoding = EncodingFactory::getIso88591();
+        $parser->language = "eng";
+        $parser->text     = $text;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00eng".$text;
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildUtfVersion3()
+    {
+        // Arrange.
+        $text   = "\xff\xfe".mb_convert_encoding("Test terms of use with UTF-16LE encoding.", "UTF-16LE");
+        $parser = new UserFrame(self::$_tagParserVersion3, self::$_frameId);
+
+        $parser->encoding = EncodingFactory::getUtf16();
+        $parser->language = "eng";
+        $parser->text     = $text;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01eng".$text;
+        self::assertSame($rawContent, $content);
+    }
+    // endregion
+
+
+    // region Version 2.4.0, build
+    /** @covers ::build */
+    public function testBuildIsoVersion4()
+    {
+        // Arrange.
+        $text   = "Test terms of use with ISO-8859-1 encoding.";
+        $parser = new UserFrame(self::$_tagParserVersion4, self::$_frameId);
+
+        $parser->encoding = EncodingFactory::getIso88591();
+        $parser->language = "eng";
+        $parser->text     = $text;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00eng".$text;
+        self::assertSame($rawContent, $content);
+    }
+
+    /** @covers ::build */
+    public function testBuildUtfVersion4()
+    {
+        // Arrange.
+        $text   = "\xff\xfe".mb_convert_encoding("Test terms of use with UTF-16LE encoding.", "UTF-16LE");
+        $parser = new UserFrame(self::$_tagParserVersion4, self::$_frameId);
+
+        $parser->encoding = EncodingFactory::getUtf16();
+        $parser->language = "eng";
+        $parser->text     = $text;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01eng".$text;
+        self::assertSame($rawContent, $content);
     }
     // endregion
 

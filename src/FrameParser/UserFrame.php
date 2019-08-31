@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
@@ -17,7 +17,7 @@ use Rhorber\ID3rw\Encoding\EncodingInterface;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 class UserFrame extends BaseFrameParser
 {
@@ -89,6 +89,23 @@ class UserFrame extends BaseFrameParser
         } elseif ($this->tagParser->getMajorVersion() === 3) {
             return $this->frameId;
         }
+    }
+
+    /**
+     * Builds and returns the binary string of the frame, for writing into a file.
+     *
+     * @return  string Frame's content (binary string).
+     * @access  public
+     * @author  Raphael Horber
+     * @version 31.08.2019
+     */
+    public function build(): string
+    {
+        $frame = $this->encoding->getCode();
+        $frame .= $this->language;
+        $frame .= $this->text;
+
+        return $frame;
     }
 }
 
