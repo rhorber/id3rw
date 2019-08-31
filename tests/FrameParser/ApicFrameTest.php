@@ -31,7 +31,7 @@ class ApicFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testIso(TagParserInterface $tagParser)
+    public function testParseIso(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = "ISO-8859-1";
@@ -61,7 +61,7 @@ class ApicFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testUtf(TagParserInterface $tagParser)
+    public function testParseUtf(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = mb_convert_encoding("UTF-16LE", "UTF-16LE");
@@ -91,7 +91,7 @@ class ApicFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testMimeTypeOmitted(TagParserInterface $tagParser)
+    public function testParseMimeTypeOmitted(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = "No MIME type";
@@ -115,6 +115,112 @@ class ApicFrameTest extends TestCase
         ];
 
         $this->assertResult($parser, $arrayKey, $array);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildIso(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $mimeType    = "image/png";
+        $description = "ISO-8859-1";
+        $pictureData = "Sample data.";
+
+        $parser = new ApicFrame($tagParser, self::$_frameId);
+
+        $parser->encoding    = EncodingFactory::getIso88591();
+        $parser->mimeType    = $mimeType;
+        $parser->pictureType = "\x03";
+        $parser->description = $description;
+        $parser->pictureData = $pictureData;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00image/png\x00\x03".$description."\x00".$pictureData;
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildUtf(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $mimeType    = "image/jpeg";
+        $description = "\xff\xfe".mb_convert_encoding("UTF-16LE", "UTF-16LE");
+        $pictureData = "Sample data.";
+
+        $parser = new ApicFrame($tagParser, self::$_frameId);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->mimeType    = $mimeType;
+        $parser->pictureType = "\x05";
+        $parser->description = $description;
+        $parser->pictureData = $pictureData;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01image/jpeg\x00\x05".$description."\x00\x00".$pictureData;
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildDefaultMimeType(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $description = "No MIME type";
+        $pictureData = "Sample data.";
+
+        $parser = new ApicFrame($tagParser, self::$_frameId);
+
+        $parser->encoding    = EncodingFactory::getIso88591();
+        $parser->pictureType = "\x03";
+        $parser->description = $description;
+        $parser->pictureData = $pictureData;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00image/\x00\x03".$description."\x00".$pictureData;
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildInvalidBom(TagParserInterface $tagParser)
+    {
+        // Assert.
+        self::expectException("UnexpectedValueException");
+        self::expectExceptionMessage("Invalid BOM, got: fefe");
+
+        // Arrange.
+        $mimeType    = "image/jpeg";
+        $description = "\xfe\xfe".mb_convert_encoding("UTF-16LE", "UTF-16LE");
+        $pictureData = "Sample data.";
+
+        $parser = new ApicFrame($tagParser, self::$_frameId);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->mimeType    = $mimeType;
+        $parser->pictureType = "\x05";
+        $parser->description = $description;
+        $parser->pictureData = $pictureData;
+
+        // Act.
+        $parser->build();
     }
 
     /** Returns parsers of the different versions. */

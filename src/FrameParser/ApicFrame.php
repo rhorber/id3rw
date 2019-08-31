@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 namespace Rhorber\ID3rw\FrameParser;
 
@@ -20,7 +20,7 @@ use Rhorber\ID3rw\Helpers;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 class ApicFrame extends BaseFrameParser
 {
@@ -73,7 +73,7 @@ class ApicFrame extends BaseFrameParser
      * @return  void
      * @access  public
      * @author  Raphael Horber
-     * @version 01.08.2019
+     * @version 31.08.2019
      */
     public function parse(string $rawContent)
     {
@@ -93,9 +93,7 @@ class ApicFrame extends BaseFrameParser
         $this->description = $strings[0];
         $this->pictureData = $strings[1];
 
-        if ($this->mimeType === "") {
-            $this->mimeType = "image/";
-        }
+        $this->_handleDefaultValues();
 
         // TODO: If MIME type is "-->", the picture data is a URL.
     }
@@ -113,6 +111,45 @@ class ApicFrame extends BaseFrameParser
         $encoded = $this->convertToInternal($this->description, $this->encoding);
 
         return $this->frameId."-".$encoded;
+    }
+
+    /**
+     * Builds and returns the binary string of the frame, for writing into a file.
+     *
+     * @return  string Frame's content (binary string).
+     * @access  public
+     * @author  Raphael Horber
+     * @version 31.08.2019
+     */
+    public function build(): string
+    {
+        $this->verifyBom($this->encoding, $this->description);
+        $this->_handleDefaultValues();
+
+        $frame = $this->encoding->getCode();
+        $frame .= $this->mimeType;
+        $frame .= "\x00";
+        $frame .= $this->pictureType;
+        $frame .= $this->description;
+        $frame .= $this->encoding->getDelimiter();
+        $frame .= $this->pictureData;
+
+        return $frame;
+    }
+
+    /**
+     * Handles default values. If properties with a default value are empty, it will be set.
+     *
+     * @return  void
+     * @access  private
+     * @author  Raphael Horber
+     * @version 31.08.2019
+     */
+    private function _handleDefaultValues()
+    {
+        if ($this->mimeType === "") {
+            $this->mimeType = "image/";
+        }
     }
 }
 

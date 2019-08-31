@@ -31,7 +31,7 @@ class WxxxFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testIso(TagParserInterface $tagParser)
+    public function testParseIso(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = "ISO-8859-1";
@@ -59,7 +59,7 @@ class WxxxFrameTest extends TestCase
      * @covers ::parse
      * @dataProvider tagParserDataProvider
      */
-    public function testUtf(TagParserInterface $tagParser)
+    public function testParseUtf(TagParserInterface $tagParser)
     {
         // Arrange.
         $description = mb_convert_encoding("UTF-16LE", "UTF-16LE");
@@ -81,6 +81,78 @@ class WxxxFrameTest extends TestCase
         ];
 
         $this->assertResult($parser, $arrayKey, $array);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildIso(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $description = "ISO-8859-1";
+        $url         = "http://www.example.com/iso.html";
+
+        $parser = new WxxxFrame($tagParser, self::$_frameId);
+
+        $parser->encoding    = EncodingFactory::getIso88591();
+        $parser->description = $description;
+        $parser->url         = $url;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x00".$description."\x00".$url;
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildUtf(TagParserInterface $tagParser)
+    {
+        // Arrange.
+        $description = "\xff\xfe".mb_convert_encoding("UTF-16LE", "UTF-16LE");
+        $url         = "http://www.example.com/utf-16.html";
+
+        $parser = new WxxxFrame($tagParser, self::$_frameId);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->description = $description;
+        $parser->url         = $url;
+
+        // Act.
+        $content = $parser->build();
+
+        // Assert.
+        $rawContent = "\x01".$description."\x00\x00".$url;
+        self::assertSame($rawContent, $content);
+    }
+
+    /**
+     * @covers ::build
+     * @dataProvider tagParserDataProvider
+     */
+    public function testBuildInvalidBom(TagParserInterface $tagParser)
+    {
+        // Assert.
+        self::expectException("UnexpectedValueException");
+        self::expectExceptionMessage("Invalid BOM, got: fefe");
+
+        // Arrange.
+        $description = "\xfe\xfe".mb_convert_encoding("UTF-16LE", "UTF-16LE");
+        $url         = "http://www.example.com/utf-16.html";
+
+        $parser = new WxxxFrame($tagParser, self::$_frameId);
+
+        $parser->encoding    = EncodingFactory::getUtf16();
+        $parser->description = $description;
+        $parser->url         = $url;
+
+        // Act.
+        $parser->build();
     }
 
     /** Returns parsers of the different versions. */

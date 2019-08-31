@@ -5,7 +5,7 @@
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  * @todo    Class name is not accurate any more (with build).
  */
 namespace Rhorber\ID3rw\FrameParser;
@@ -19,7 +19,7 @@ use Rhorber\ID3rw\TagParser\TagParserInterface;
  *
  * @package Rhorber\ID3rw\FrameParser
  * @author  Raphael Horber
- * @version 01.08.2019
+ * @version 31.08.2019
  */
 class BaseFrameParser
 {
@@ -152,6 +152,28 @@ class BaseFrameParser
     protected function convertToInternal(string $string, EncodingInterface $fromEncoding): string
     {
         return mb_convert_encoding($string, mb_internal_encoding(), $fromEncoding->getName());
+    }
+
+    /**
+     * Verifies if the passed encoding uses a BOM and if so, if the passed string has a valid one.
+     *
+     * @param EncodingInterface $encoding Encoding to check if a BOM is used.
+     * @param string $string String to check for a valid BOM (if required).
+     *
+     * @return  void
+     * @throws  \UnexpectedValueException If the encoding uses a BOM and the string contains an invalid one.
+     * @access  protected
+     * @author  Raphael Horber
+     * @version 31.08.2019
+     */
+    protected function verifyBom(EncodingInterface $encoding, string $string)
+    {
+        if ($encoding->hasBom()) {
+            $bom = substr($string, 0, 2);
+            if ($bom !== "\xff\xfe" && $bom !== "\xfe\xff") {
+                throw new \UnexpectedValueException("Invalid BOM, got: ".bin2hex($bom));
+            }
+        }
     }
 }
 
